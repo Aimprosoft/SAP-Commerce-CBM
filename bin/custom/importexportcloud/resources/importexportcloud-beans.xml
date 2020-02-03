@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+	<bean class="com.aimprosoft.importexportcloud.facades.data.StorageTypeData">
+		<property name="code" type="java.lang.String"/>
+		<property name="name" type="java.lang.String"/>
+		<property name="isLocal" type="java.lang.Boolean"/>
+		<property name="isDefault" type="java.lang.Boolean"/>
+		<property name="isAuthNeeded" type="java.lang.Boolean"/>
+	</bean>
+
+	<bean class="com.aimprosoft.importexportcloud.facades.data.StorageConfigData">
+		<property name="code" type="java.lang.String" equals="true"/>
+		<property name="name" type="java.lang.String" equals="true"/>
+		<property name="storageTypeData" type="StorageTypeData" equals="true"/>
+		<property name="isConnected" type="java.lang.Boolean"/>
+		<property name="rootFolder" type="java.lang.String"/>
+		<!--aws s3-->
+		<property name="appKey" type="java.lang.String"/>
+		<property name="region" type="java.lang.String"/>
+		<property name="encodedAppSecret" type="java.lang.String"/>
+		<property name="bucketName" type="java.lang.String"/>
+		<!--dropBox-->
+		<property name="authCode" type="java.lang.String"/>
+		<property name="accessToken" type="java.lang.String"/>
+	</bean>
+
+	<bean class="com.aimprosoft.importexportcloud.facades.data.TaskInfoData">
+		<property name="config" type="StorageConfigData"/>
+		<property name="taskInfoCode" type="String"/>
+		<property name="cloudFolderPath" type="java.lang.String"/>
+		<property name="cloudFileDownloadPath" type="java.lang.String"/>
+		<property name="cloudFileDownloadPathToDisplay" type="java.lang.String"/>
+		<!-- represents cloud folder path where to upload file. It's cloud specific		-->
+		<property name="cloudUploadFolderPath" type="java.lang.String"/>
+		<!-- represents user friendly cloud folder path to show in UI		-->
+		<property name="cloudUploadFolderPathToDisplay" type="java.lang.String"/>
+		<property name="downloadedFilePath" type="java.nio.file.Path"/>
+		<property name="fileToUploadPath" type="java.nio.file.Path"/>
+		<property name="resultPrefix" type="java.lang.String"/>
+		<property name="realFileName" type="java.lang.String"/>
+		<property name="exportedMediaCode" type="java.lang.String"/>
+		<property name="cmsSiteUid" type="java.lang.String"/>
+		<!--catalogVersionModel.catalog + ":" +  catalogVersionModel.version		-->
+		<property name="catalogIdAndVersionName" type="java.lang.String"/>
+		<property name="taskInfoScopeCode" type="java.lang.String"/>
+		<property name="exportMediaNeeded" type="boolean"/>
+		<property name="migrateMediaNeeded" type="boolean"/>
+		<property name="isExport" type="java.lang.Boolean"/>
+	</bean>
+
+	<bean class="com.aimprosoft.importexportcloud.facades.data.CloudObjectData">
+		<property name="name" type="java.lang.String"/>
+		<property name="title" type="java.lang.String"/>
+		<property name="pathDisplay" type="java.lang.String"/>
+		<property name="folder" type="boolean"/>
+		<property name="modifiedDate" type="java.lang.String"/>
+	</bean>
+</beans>

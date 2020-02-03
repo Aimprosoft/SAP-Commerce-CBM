@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget-definition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widget-definition.xsd"
+                   id="com.aimprosoft.importexportbackoffice.widgets.sourceselectorwidget.sourceselectorwidget">
+    <name>Source Selector</name>
+    <description>Source selector widget</description>
+    <defaultTitle>Source selector</defaultTitle>
+    <author>aimprosoft</author>
+    <version>0.1</version>
+
+    <sockets>
+        <input id="reset" type="com.aimprosoft.importexportcloud.facades.data.StorageConfigData"/>
+        <input id="inputStorageConfigData" type="com.aimprosoft.importexportcloud.facades.data.StorageConfigData"/>
+        <input id="selectedScope" type="java.lang.String"/>
+        <output id="outputCatalog" type="java.lang.String"/>
+        <output id="outputSite" type="java.lang.String"/>
+    </sockets>
+
+    <controller class="com.aimprosoft.importexportbackoffice.widgets.sourceselectorwidget.SourceSelectorWidgetController"/>
+</widget-definition>

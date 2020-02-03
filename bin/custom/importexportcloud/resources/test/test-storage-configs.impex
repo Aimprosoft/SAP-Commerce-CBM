@@ -1,0 +1,11 @@
+INSERT_UPDATE StorageType;code[unique=true];name;local;default;authNeeded
+;aWSs3StorageType; Amazon S3;false;false;false
+;dropBoxStorageType;Dropbox;false;false;true
+
+# please fill in the mocked attributes (appKey, region, encodedAppSecret anf bucketName) with your s3 storage values to make the integration tests work correctly
+INSERT_UPDATE AWSs3StorageConfig;code[unique=true];name;type(code);appKey;region;encodedAppSecret;user(UID);bucketName
+;testStorageConfig;Test S3 config;aWSs3StorageType;mock;mock;mock;testUser;mock
+
+# please fill in the mocked attributes (appKey, encodedAppSecret and accessToken) with your dropbox storage values to make the integration tests work correctly
+INSERT_UPDATE DropBoxStorageConfig;code[unique=true];name;type(code);appKey;encodedAppSecret;accessToken;user(UID);
+;testDropBoxStorageConfig;Test DropBox config;dropBoxStorageType;mock;mock;mock;testUser

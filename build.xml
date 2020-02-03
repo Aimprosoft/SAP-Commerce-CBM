@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<project name="importexportbackoffice" >
+    <target name="local">
+        <copy todir="./config/" overwrite="true">
+            <fileset dir="./environments/local/config/"/>
+        </copy>
+        <echo>Local selected</echo>
+    </target>
+    <target name="QA">
+        <copy todir="./config/" overwrite="true">
+            <fileset dir="./environments/qa/config/"/>
+        </copy>
+        <echo>QA selected</echo>
+    </target>
+</project>
+
+

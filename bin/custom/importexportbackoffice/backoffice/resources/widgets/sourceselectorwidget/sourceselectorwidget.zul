@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<widget id="sourceselectorwidget" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://www.zkoss.org/2005/zul" xmlns:w="client"
+        xmlns:h="http://www.w3.org/1999/xhtml" xmlns:ca="client/attribute">
+
+    <vlayout id="mainLayout" spacing="20px" width="100%" sclass="iem-main-layout">
+        <hlayout spacing="10px">
+            <combobox id="siteTypesComboBox" width="280px" readonly="true" placeholder="${labels.sourceselector.placeholder.sites}">
+                <template name="model">
+                    <comboitem label="${each.name}"/>
+                </template>
+            </combobox>
+        </hlayout>
+        <hlayout spacing="10px" visible="false">
+            <combobox id="catalogTypesComboBox" width="280px" readonly="true" placeholder="${labels.sourceselector.placeholder.catalog}">
+                <template name="model">
+                    <comboitem label="${each.catalog.name.concat(':').concat(each.version)}"/>
+                </template>
+            </combobox>
+        </hlayout>
+    </vlayout>
+
+</widget>

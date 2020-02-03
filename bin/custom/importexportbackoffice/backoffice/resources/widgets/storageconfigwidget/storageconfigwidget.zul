@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<widget id="storageConfigWidget" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://www.zkoss.org/2005/zul">
+
+    <vlayout id="mainLayout" spacing="10px" width="100%" sclass="iem-main-layout">
+        <label value="${labels.label.choose.storage.type}" sclass="storage-config-widget-label"/>
+        <combobox id="storageTypeComboBox" width="280px" readonly="true" placeholder="${labels.storagetypecombobox.select.storage.type}">
+            <template name="model">
+                <comboitem label="${each.name}"/>
+            </template>
+        </combobox>
+        <vlayout id="storageConfigLayout" spacing="10px" visible="false">
+            <separator spacing="15px"/>
+            <label value="${labels.label.choose.account}" sclass="storage-config-widget-label"/>
+            <hlayout spacing="10px">
+                <combobox id="storageConfigComboBox" width="280px" readonly="true" placeholder="${labels.storageconfigcombobox.select.storage.config}">
+                    <template name="model">
+                        <comboitem label="${each.name}"/>
+                    </template>
+                </combobox>
+                <button id="dropBoxAuthButton" label="${labels.storageconfig.button.to.dropbox}" width="145px" visible="false"/>
+                <button id="connectStorageConfigButton" sclass="icon-connect disable" width="145px" disabled="true" autodisable="self" />
+                <button id="editStorageConfigButton" iconSclass="z-icon-pencil" disabled="true" tooltiptext="${labels.storageconfig.button.edit}"/>
+                <button id="disconnectButton" tooltiptext="${labels.storageconfig.button.disconnect}" sclass="icon-disconnect disable" disabled="true" />
+                <button id="removeStorageConfigButton" sclass="icon-remove disable" disabled="true" tooltiptext="${labels.storageconfig.button.remove}"/>
+            </hlayout>
+            <hlayout spacing="100px" valign="middle">
+                <button id="addStorageConfigButton" iconSclass="z-icon-plus-square" label="${labels.storageconfig.button.add}"/>
+            </hlayout>
+        </vlayout>
+    </vlayout>
+
+</widget>

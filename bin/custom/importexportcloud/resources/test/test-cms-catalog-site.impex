@@ -1,0 +1,12 @@
+INSERT_UPDATE ContentCatalog;id[unique=true];name[lang=de];name[lang=en];
+;testcatalog;;;
+
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];active;defaultCurrency(isocode);languages(isoCode);readPrincipals(uid)
+;testcatalog;Staged;false;;en;;
+;testcatalog;Online;true;;en;;
+
+INSERT_UPDATE BaseStore;uid[unique=true];catalogs(id)
+;defaultstore;;
+
+INSERT_UPDATE CMSSite;uid[unique=true];name[lang=en];stores(uid);contentCatalogs(id);urlPatterns;defaultCatalog(id);previewURL;validComponentTypes(code)
+;testsite;My Site;defaultstore;testcatalog;;;;AbstractCMSComponent,AbstractCMSComponentContainer,SimpleCMSComponent

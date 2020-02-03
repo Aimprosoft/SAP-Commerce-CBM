@@ -1,0 +1,340 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<alias name="defaultStorageConfigService" alias="storageConfigService"/>
+	<bean id="defaultStorageConfigService"
+	      class="com.aimprosoft.importexportcloud.service.impl.DefaultStorageConfigService" parent="abstractBusinessService">
+		<property name="storageConfigDao" ref="storageConfigGenericDao"/>
+		<property name="storageTypeService" ref="storageTypeService"/>
+	</bean>
+
+	<alias name="defaultStorageConfigGenericDao" alias="storageConfigGenericDao"/>
+	<bean id="defaultStorageConfigGenericDao" class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+		<constructor-arg value="StorageConfig"/>
+	</bean>
+
+	<alias name="defaultStorageTypeService" alias="storageTypeService"/>
+	<bean id="defaultStorageTypeService"
+	      class="com.aimprosoft.importexportcloud.service.impl.DefaultStorageTypeService">
+		<property name="storageTypeDao" ref="storageTypeGenericDao"/>
+	</bean>
+
+	<alias name="defaultStorageTypeGenericDao" alias="storageTypeGenericDao"/>
+	<bean id="defaultStorageTypeGenericDao" class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+		<constructor-arg value="StorageType"/>
+	</bean>
+
+	<alias name="defaultStorageTypePopulator" alias="storageTypePopulator"/>
+	<bean id="defaultStorageTypePopulator"
+	      class="com.aimprosoft.importexportcloud.converters.populators.StorageTypePopulator"/>
+
+	<alias name="defaultStorageTypeConverter" alias="storageTypeConverter"/>
+	<bean id="defaultStorageTypeConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="com.aimprosoft.importexportcloud.facades.data.StorageTypeData"/>
+		<property name="populators">
+			<list>
+				<ref bean="storageTypePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultAppKeyBasedStorageConfigPopulator" alias="appKeyBasedStorageConfigPopulator"/>
+	<bean id="defaultAppKeyBasedStorageConfigPopulator"
+	      class="com.aimprosoft.importexportcloud.converters.populators.AppKeyBasedStorageConfigPopulator"/>
+
+	<alias name="defaultStorageConfigPopulator" alias="storageConfigPopulator"/>
+	<bean id="defaultStorageConfigPopulator"
+	      class="com.aimprosoft.importexportcloud.converters.populators.StorageConfigPopulator">
+		<property name="storageTypeConverter" ref="storageTypeConverter"/>
+	</bean>
+
+	<alias name="defaultAWSs3StorageConfigPopulator" alias="aWSs3StorageConfigPopulator"/>
+	<bean id="defaultAWSs3StorageConfigPopulator"
+	      class="com.aimprosoft.importexportcloud.converters.populators.AWSs3StorageConfigPopulator"/>
+
+	<alias name="defaultAWSs3StorageConfigConverter" alias="aWSs3StorageConfigConverter"/>
+	<bean id="defaultAWSs3StorageConfigConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="com.aimprosoft.importexportcloud.facades.data.StorageConfigData"/>
+		<property name="populators">
+			<list>
+				<ref bean="storageConfigPopulator"/>
+				<ref bean="appKeyBasedStorageConfigPopulator"/>
+				<ref bean="aWSs3StorageConfigPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultDropBoxStorageConfigPopulator" alias="dropBoxStorageConfigPopulator"/>
+	<bean id="defaultDropBoxStorageConfigPopulator"
+	      class="com.aimprosoft.importexportcloud.converters.populators.DropBoxStorageConfigPopulator"/>
+
+	<alias name="defaultDropBoxStorageConfigConverter" alias="dropBoxStorageConfigConverter"/>
+	<bean id="defaultDropBoxStorageConfigConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="com.aimprosoft.importexportcloud.facades.data.StorageConfigData"/>
+		<property name="populators">
+			<list>
+				<ref bean="storageConfigPopulator"/>
+				<ref bean="appKeyBasedStorageConfigPopulator"/>
+				<ref bean="dropBoxStorageConfigPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultLocalStorageConfigConverter" alias="localStorageConfigConverter"/>
+	<bean id="defaultLocalStorageConfigConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="com.aimprosoft.importexportcloud.facades.data.StorageConfigData"/>
+		<property name="populators">
+			<list>
+				<ref bean="storageConfigPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<util:map id="storageConfigConverters">
+		<entry key="aWSs3StorageType" value-ref="aWSs3StorageConfigConverter"/>
+		<entry key="dropBoxStorageType" value-ref="dropBoxStorageConfigConverter"/>
+		<entry key="localStorageType" value-ref="localStorageConfigConverter"/>
+	</util:map>
+
+	<util:map id="typeConfigClassMap" key-type="java.lang.String" value-type="java.lang.Class">
+		<entry key="aWSs3StorageType" value="com.aimprosoft.importexportcloud.model.AWSs3StorageConfigModel"/>
+		<entry key="dropBoxStorageType" value="com.aimprosoft.importexportcloud.model.DropBoxStorageConfigModel"/>
+	</util:map>
+
+	<alias name="defaultBaseStorageConfigReversePopulator" alias="baseStorageConfigReversePopulator"/>
+	<bean id="defaultBaseStorageConfigReversePopulator"
+	      class="com.aimprosoft.importexportcloud.converters.populators.BaseStorageConfigReversePopulator">
+		<property name="storageTypeService" ref="storageTypeService"/>
+		<property name="userService" ref="userService"/>
+		<property name="keyGenerator" ref="storageConfigCodeGenerator"/>
+	</bean>
+
+	<alias name="defaultAWSs3StorageConfigReversePopulator" alias="aWSs3StorageConfigReversePopulator"/>
+	<bean id="defaultAWSs3StorageConfigReversePopulator"
+	      class="com.aimprosoft.importexportcloud.converters.populators.AWSs3StorageConfigReversePopulator"/>
+
+	<alias name="defaultAWSs3StorageConfigReverseConverter" alias="aWSs3StorageConfigReverseConverter"/>
+	<bean id="defaultAWSs3StorageConfigReverseConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="com.aimprosoft.importexportcloud.model.AWSs3StorageConfigModel"/>
+		<property name="populators">
+			<list>
+				<ref bean="baseStorageConfigReversePopulator"/>
+				<ref bean="defaultAWSs3StorageConfigReversePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultDropBoxStorageConfigReversePopulator" alias="dropBoxStorageConfigReversePopulator"/>
+	<bean id="defaultDropBoxStorageConfigReversePopulator"
+	      class="com.aimprosoft.importexportcloud.converters.populators.DropBoxStorageConfigReversePopulator"/>
+
+	<alias name="defaultDropBoxStorageConfigReverseConverter" alias="dropBoxStorageConfigReverseConverter"/>
+	<bean id="defaultDropBoxStorageConfigReverseConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="com.aimprosoft.importexportcloud.model.DropBoxStorageConfigModel"/>
+		<property name="populators">
+			<list>
+				<ref bean="baseStorageConfigReversePopulator"/>
+				<ref bean="defaultDropBoxStorageConfigReversePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<util:map id="storageServicesMap">
+		<entry key="aWSs3StorageType" value-ref="awSs3StorageService"/>
+		<entry key="dropBoxStorageType" value-ref="dropBoxStorageService"/>
+		<entry key="localStorageType" value-ref="localStorageService"/>
+	</util:map>
+
+	<util:map id="connectionServicesMap">
+		<entry key="aWSs3StorageType" value-ref="s3ConnectionService"/>
+		<entry key="dropBoxStorageType" value-ref="dropBoxConnectionService"/>
+		<entry key="localStorageType" value-ref="localConnectionService"/>
+	</util:map>
+
+	<bean id="abstractConnectionService"
+	      class="com.aimprosoft.importexportcloud.service.connection.impl.AbstractConnectionService"
+	      abstract="true" parent="abstractBusinessService">
+		<property name="storageConfigService" ref="storageConfigService"/>
+		<property name="storageConfigValidator" ref="storageConfigValidator"/>
+	</bean>
+
+	<alias name="defaultS3ConnectionService" alias="s3ConnectionService"/>
+	<bean name="defaultS3ConnectionService"
+	      class="com.aimprosoft.importexportcloud.service.connection.impl.DefaultS3ConnectionService"
+	      parent="abstractConnectionService">
+		<property name="s3ConnectionProvider" ref="s3ConnectionProvider"/>
+	</bean>
+
+	<alias name="defaultDropBoxConnectionService" alias="dropBoxConnectionService"/>
+	<bean name="defaultDropBoxConnectionService"
+	      class="com.aimprosoft.importexportcloud.service.connection.impl.DefaultDropBoxConnectionService"
+	      parent="abstractConnectionService">
+		<property name="clientIdentifier" value="${dbx.request.config.client.identifier}"/>
+		<property name="dropboxConnectionProvider" ref="dropboxConnectionProvider"/>
+	</bean>
+
+	<alias name="defaultLocalConnectionService" alias="localConnectionService"/>
+	<bean name="defaultLocalConnectionService"
+	      class="com.aimprosoft.importexportcloud.service.connection.impl.DefaultLocalConnectionService"
+	      parent="abstractConnectionService">
+	</bean>
+
+	<alias name="defaultDropboxConnectionProvider" alias="dropboxConnectionProvider"/>
+	<bean id="defaultDropboxConnectionProvider" class="com.aimprosoft.importexportcloud.providers.impl.DefaultDropboxConnectionProvider"/>
+
+	<alias name="defaultS3ConnectionProvider" alias="s3ConnectionProvider"/>
+	<bean id="defaultS3ConnectionProvider" class="com.aimprosoft.importexportcloud.providers.impl.DefaultS3ConnectionProvider"/>
+
+	<bean id="abstractStorageService"
+	      class="com.aimprosoft.importexportcloud.service.storage.impl.AbstractStorageService"
+	      abstract="true" parent="abstractBusinessService">
+		<property name="storageConfigValidator" ref="storageConfigValidator"/>
+	</bean>
+
+	<bean name="awSs3StorageService"
+	      class="com.aimprosoft.importexportcloud.service.storage.impl.S3StorageService"
+	      parent="abstractStorageService">
+		<property name="s3FileDataConverter" ref="s3FileDataConverter"/>
+		<property name="s3FolderDataConverter" ref="s3FolderDataConverter"/>
+		<property name="s3ConnectionProvider" ref="s3ConnectionProvider"/>
+	</bean>
+
+	<bean name="dropBoxStorageService"
+	      class="com.aimprosoft.importexportcloud.service.storage.impl.DropBoxStorageService"
+	      parent="abstractStorageService">
+		<property name="fileDataConverter" ref="dropBoxFileDataConverter"/>
+		<property name="folderDataConverter" ref="dropBoxFolderDataConverter"/>
+		<property name="clientIdentifier" value="${dbx.request.config.client.identifier}"/>
+		<property name="dropboxConnectionProvider" ref="dropboxConnectionProvider"/>
+	</bean>
+
+	<bean name="localStorageService"
+	      class="com.aimprosoft.importexportcloud.service.storage.impl.LocalStorageService"
+	      parent="abstractStorageService">
+	</bean>
+
+	<bean id="awSs3StorageConfigValidationStrategy"
+	      class="com.aimprosoft.importexportcloud.service.validators.strategies.impl.AWSs3StorageConfigValidationStrategy"/>
+
+	<bean id="dropBoxStorageConfigValidationStrategy"
+	      class="com.aimprosoft.importexportcloud.service.validators.strategies.impl.DropBoxStorageConfigValidationStrategy"/>
+
+	<util:map id="storageConfigValidationStrategyMap">
+		<entry key="aWSs3StorageType" value-ref="awSs3StorageConfigValidationStrategy"/>
+		<entry key="dropBoxStorageType" value-ref="dropBoxStorageConfigValidationStrategy"/>
+		<entry key="localStorageType" value-ref="localStorageValidationStrategy"/>
+	</util:map>
+
+	<alias name="defaultStorageConfigValidator" alias="storageConfigValidator"/>
+	<bean id="defaultStorageConfigValidator"
+	      class="com.aimprosoft.importexportcloud.service.validators.impl.DefaultStorageConfigValidator">
+		<property name="storageConfigValidationStrategyMap" ref="storageConfigValidationStrategyMap"/>
+	</bean>
+
+	<alias name="defaultCloudStorageFacade" alias="cloudStorageFacade"/>
+	<bean name="defaultCloudStorageFacade"
+	      class="com.aimprosoft.importexportcloud.facades.impl.DefaultCloudStorageFacade">
+		<property name="storageServices" ref="storageServicesMap"/>
+		<property name="connectionServices" ref="connectionServicesMap"/>
+		<property name="importFacade" ref="importFacade"/>
+		<property name="exportFacade" ref="exportFacade"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="mediaService" ref="mediaService"/>
+		<property name="taskInfoService" ref="taskInfoService"/>
+		<property name="storageConfigValidator" ref="storageConfigValidator"/>
+	</bean>
+
+	<alias name="defaultStorageConfigFacade" alias="storageConfigFacade"/>
+	<bean id="defaultStorageConfigFacade"
+	      class="com.aimprosoft.importexportcloud.facades.impl.DefaultStorageConfigFacade">
+		<property name="storageConfigService" ref="storageConfigService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="userService" ref="userService"/>
+		<property name="storageConfigConverters" ref="storageConfigConverters"/>
+		<property name="storageConfigReverseConverters" ref="storageConfigReverseConverters"/>
+		<property name="typeConfigClassMap" ref="typeConfigClassMap"/>
+	</bean>
+
+	<alias name="defaultStorageTypeFacade" alias="storageTypeFacade"/>
+	<bean id="defaultStorageTypeFacade" class="com.aimprosoft.importexportcloud.facades.impl.DefaultStorageTypeFacade">
+		<property name="storageTypeService" ref="storageTypeService"/>
+		<property name="storageTypeConverter" ref="storageTypeConverter"/>
+	</bean>
+
+	<bean id="storageConfigCodeGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator">
+		<property name="key" value="${keygen.storageconfig.code.name}"/>
+		<property name="digits" value="${keygen.storageconfig.code.digits}"/>
+		<property name="start" value="${keygen.storageconfig.code.start}"/>
+		<property name="type" value="${keygen.storageconfig.code.type}"/>
+		<property name="template" value="${keygen.storageconfig.code.template}"/>
+	</bean>
+
+	<alias name="defaultFileMetadataCloudObjectDataPopulator" alias="fileMetadataCloudObjectDataPopulator"/>
+	<bean id="defaultFileMetadataCloudObjectDataPopulator"
+	      class="com.aimprosoft.importexportcloud.converters.populators.FileMetadataCloudObjectDataPopulator"/>
+
+	<alias name="defaultFolderMetadataCloudObjectDataPopulator" alias="folderMetadataCloudObjectDataPopulator"/>
+	<bean id="defaultFolderMetadataCloudObjectDataPopulator"
+	      class="com.aimprosoft.importexportcloud.converters.populators.FolderMetadataCloudObjectDataPopulator"/>
+
+	<alias name="defaultDropBoxFileDataConverter" alias="dropBoxFileDataConverter"/>
+	<bean id="defaultDropBoxFileDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="com.aimprosoft.importexportcloud.facades.data.CloudObjectData"/>
+		<property name="populators">
+			<list>
+				<ref bean="fileMetadataCloudObjectDataPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultDropBoxFolderDataConverter" alias="dropBoxFolderDataConverter"/>
+	<bean id="defaultDropBoxFolderDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="com.aimprosoft.importexportcloud.facades.data.CloudObjectData"/>
+		<property name="populators">
+			<list>
+				<ref bean="folderMetadataCloudObjectDataPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultS3ObjectCloudObjectDataPopulator" alias="s3ObjectCloudObjectDataPopulator"/>
+	<bean id="defaultS3ObjectCloudObjectDataPopulator"
+	      class="com.aimprosoft.importexportcloud.converters.populators.S3ObjectCloudObjectDataPopulator"/>
+
+	<alias name="defaultCommonPrefixCloudObjectDataPopulator" alias="commonPrefixCloudObjectDataPopulator"/>
+	<bean id="defaultCommonPrefixCloudObjectDataPopulator"
+	      class="com.aimprosoft.importexportcloud.converters.populators.CommonPrefixCloudObjectDataPopulator"/>
+
+	<alias name="defaultS3FileDataConverter" alias="s3FileDataConverter"/>
+	<bean id="defaultS3FileDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="com.aimprosoft.importexportcloud.facades.data.CloudObjectData"/>
+		<property name="populators">
+			<list>
+				<ref bean="s3ObjectCloudObjectDataPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="localStorageValidationStrategy"
+	      class="com.aimprosoft.importexportcloud.service.validators.strategies.impl.LocalStorageValidationStrategy">
+	</bean>
+
+
+	<alias name="defaultS3FolderDataConverter" alias="s3FolderDataConverter"/>
+	<bean id="defaultS3FolderDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="com.aimprosoft.importexportcloud.facades.data.CloudObjectData"/>
+		<property name="populators">
+			<list>
+				<ref bean="defaultCommonPrefixCloudObjectDataPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<util:map id="storageConfigReverseConverters" map-class="java.util.HashMap">
+		<entry key="aWSs3StorageType" value-ref="aWSs3StorageConfigReverseConverter"/>
+		<entry key="dropBoxStorageType" value-ref="dropBoxStorageConfigReverseConverter"/>
+	</util:map>
+
+</beans>

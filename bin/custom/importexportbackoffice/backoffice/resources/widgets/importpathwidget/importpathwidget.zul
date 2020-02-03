@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<widget id="importPathWidget" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://www.zkoss.org/2005/zul" xmlns:w="client"
+        xmlns:h="http://www.w3.org/1999/xhtml" xmlns:ca="client/attribute">
+
+    <panel sclass="z-top-header" if="${widgetSettings.isExport == false}">
+        <panelchildren>
+            <!--todo add css-->
+            <label style="background-color:#eaedf1; font-family:'Open Sans',Arial,Sans-serif; color:rgb(4, 50, 99)
+; font-size:16px; font-style:normal; font-weight:600; text-align:left; text-overflow:ellipsis;text-size-adjust:100% " value="${labels.task.view.startimport}"/>
+        </panelchildren>
+    </panel>
+
+    <hlayout id="mainLayout" width="100%" sclass="iem-main-layout">
+        <vlayout spacing="15px">
+            <checkbox id="exportMediaNeededCheckBoxImport" label="${labels.task.label.include.media}"
+                      sclass="primary-widget-label"
+                      forward="onClick=exportMediaNeededCheckBoxImport.onSelectedExportMediaNeededImport()"
+                      visible="true" checked="true" if="${widgetSettings.isExport == false}"/>
+            <hlayout>
+                <label id="storageName" value="${labels.task.label.selected.account}" sclass="primary-widget-label"/>
+                <label id="accountLabel" value="${labels.task.label.selected.configuration}"
+                       sclass="primary-widget-label"/>
+                <label id="selectedStorageConfigLabel" value="${labels.task.label.none}"
+                       sclass="primary-widget-label"/>
+            </hlayout>
+            <hlayout>
+                <label id="pathLabel" sclass="primary-widget-label"/>
+                <label id="displayPathLabel" sclass="primary-widget-label"/>
+                <label id="realFilePathLabel" visible="false" sclass="primary-widget-label"/>
+            </hlayout>
+
+            <label if="${widgetSettings.isExport == true}" value="${labels.task.label.result.prefix}"
+                   sclass="primary-widget-label"/>
+
+            <hlayout spacing="20px">
+                <hlayout spacing="20px" if="${widgetSettings.isExport == true}">
+                    <textbox id="resultPrefixTextBox" width="280px" disabled="false"
+                             maxlength="255"
+                             placeholder="${labels.task.label.result.placeholder}"/>
+                </hlayout>
+                <hlayout valign="middle" spacing="10px" visible="true">
+                    <button id="choosePathButton" width="170px" disabled="true"/>
+                    <button id="chooseLocalPathButton" width="170px" visible="false"
+                            disabled="true" upload="true, accept=.zip, maxsize=-1">
+                        <attribute name="onUpload"/>
+                    </button>
+                </hlayout>
+                <button id="startButton" width="175px" disabled="true"/>
+                <button id="downloadButton" width="175px" label="${labels.task.button.download}" visible="false"
+                        if="${widgetSettings.isExport == true}"/>
+            </hlayout>
+            <hlayout>
+                <div id="errorMessage" visible="false" sclass="errortext">${labels.task.label.result.name.considerations}
+                </div>
+            </hlayout>
+        </vlayout>
+    </hlayout>
+</widget>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<widget-definition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widget-definition.xsd"
+	id="com.aimprosoft.importexportbackoffice.widgets.scopeswidget">
+	<name>Scopes</name>
+	<description>Export scopes</description>
+	<defaultTitle>Scopes Configuration</defaultTitle>
+	<author>aimprosoft</author>
+	<version>0.1</version>
+
+	<sockets>
+		<input id="reset" type="com.aimprosoft.importexportcloud.facades.data.StorageConfigData"/>
+		<output id="selectedScope" type="java.lang.String"/>
+		<output id="outputSelectedExportMediaNeeded" type="java.lang.Boolean"/>
+	</sockets>
+	<keywords>
+		<keyword>Scopes</keyword>
+	</keywords>
+	<controller class="com.aimprosoft.importexportbackoffice.widgets.scopeswidget.ScopesController" />
+</widget-definition>

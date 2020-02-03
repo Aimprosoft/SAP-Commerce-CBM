@@ -1,0 +1,234 @@
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widgets.xsd">
+
+	<widget-extension widgetId="backofficeMainSlot">
+		<widget id="importExportBackofficePerspective" widgetDefinitionId="com.hybris.cockpitng.borderlayout"
+		        slotId="perspectives" title="importexportbackoffice.perspective.name">
+
+			<widget id="iemExplorerTree" widgetDefinitionId="com.hybris.cockpitng.widgets.common.explorertree"
+			        slotId="leftSlot">
+
+				<widget id="iemExplorerTreeSelectionFirstProxy"
+				        widgetDefinitionId="com.hybris.cockpitng.widgets.common.multiplexer"
+				        slotId="cockpitWidgetChildrenInvisible">
+					<setting key="iem_expression" type="String"
+					         value="#root.id EQ 'iemodule_tree_navigation_import' || #root.id EQ 'iemodule_tree_navigation_export'"/>
+					<setting key="history_expression" type="String"
+					         value="#root.id EQ 'hmc_type_node_export_task_info' || #root.id EQ 'hmc_type_node_import_task_info'"/>
+					<virtual-sockets>
+						<output id="iem" type="com.hybris.backoffice.navigation.NavigationNode"/>
+						<output id="history" type="com.hybris.backoffice.navigation.NavigationNode"/>
+					</virtual-sockets>
+				</widget>
+
+				<widget id="iemExplorerTreeSelectionProxy" widgetDefinitionId="com.hybris.cockpitng.widgets.common.multiplexer"
+				        slotId="cockpitWidgetChildrenInvisible">
+					<setting key="import_expression" type="String" value="#root.id EQ 'iemodule_tree_navigation_import'"/>
+					<setting key="export_expression" type="String" value="#root.id EQ 'iemodule_tree_navigation_export'"/>
+					<virtual-sockets>
+						<output id="import" type="com.hybris.backoffice.navigation.NavigationNode"/>
+						<output id="export" type="com.hybris.backoffice.navigation.NavigationNode"/>
+					</virtual-sockets>
+				</widget>
+
+				<setting key="explorerTreeConfigCtx" type="String" value="iembackoffice-explorer-tree"/>
+				<setting key="allowFilteringEntries" type="Boolean" value="false"/>
+				<virtual-sockets/>
+			</widget>
+
+			<widget id="iem_content_container" widgetDefinitionId="com.hybris.backoffice.perspectiveContainer"
+			        slotId="centerSlot" template="false">
+
+				<widget id="iemMainBorderLayout" widgetDefinitionId="com.hybris.cockpitng.borderlayout" slotId="perspectives">
+
+					<widget id="storageConfigBorderLayout"
+					        widgetDefinitionId="com.hybris.cockpitng.borderlayout"
+					        slotId="headerSlot">
+						<widget id="importStorageConfigWidget"
+						        widgetDefinitionId="com.aimprosoft.importexportbackoffice.widgets.storageconfigwidget"
+						        slotId="centerSlot">
+							<virtual-sockets>
+								<output id="closeEast" type="java.lang.Object"/>
+								<output id="openEast" type="java.lang.Object"/>
+							</virtual-sockets>
+						</widget>
+
+						<widget id="storageConfigEditorArea"
+						        widgetDefinitionId="com.hybris.cockpitng.backoffice.defaultEditorArea"
+						        slotId="rightSlot">
+
+							<setting key="viewModeBtnVisible" type="Boolean" value="false"/>
+							<setting key="initViewMode" type="String" value="fluid"/>
+							<setting key="fluidViewCode" type="String" value="fluid"/>
+							<setting key="editorAreaConfigCtx" type="String" value="editor-area"/>
+							<setting key="bottomToolbar" type="Boolean" value="false"/>
+							<setting key="actionSlotComponentId" type="String" value="editorareaactions"/>
+							<virtual-sockets/>
+						</widget>
+
+						<setting key="northDisabled" type="Boolean" value="true"/>
+						<setting key="southDisabled" type="Boolean" value="true"/>
+						<setting key="westDisabled" type="Boolean" value="true"/>
+						<setting key="eastDisabled" type="Boolean" value="false"/>
+						<setting key="eastWidth" type="String" value="50%"/>
+						<setting key="eastCollapsible" type="Boolean" value="true"/>
+						<setting key="eastClosed" type="Boolean" value="true"/>
+						<setting key="broadcastHorizontalResize" type="Boolean" value="true"/>
+						<setting key="opaqueBG" type="Boolean" value="false"/>
+						<setting key="autoCloseWest" type="Boolean" value="true"/>
+					</widget>
+
+					<widget id="iemViewSwitcher" widgetDefinitionId="com.hybris.backoffice.viewswitcher"
+					        slotId="bottomSlot">
+
+						<widget id="cloudpopupwidget"
+						        widgetDefinitionId="com.aimprosoft.importexportbackoffice.widgets.cloudpopupwidget"
+						        slotId="cockpitWidgetChildrenInvisible" template="true">
+
+							<instance-settings socketEventRoutingMode="LAST_USED">
+								<create onInit="false" reuseExisting="true">
+									<all-incoming-events/>
+								</create>
+								<close>
+									<all-outgoing-events/>
+								</close>
+								<select onInit="false">
+									<all-incoming-events/>
+								</select>
+							</instance-settings>
+
+							<setting key="widgetStyleClass" type="String"></setting>
+							<setting key="__externalLocationPath" type="String">extension://importexportbackoffice</setting>
+							<setting key="widgetStyleAttribute" type="String"></setting>
+							<setting key="_width" type="String">1140px</setting>
+							<setting key="_height" type="String">650px</setting>
+							<virtual-sockets/>
+						</widget>
+
+						<setting key="selectiemImportBorderLayoutView_eval" type="String" value="'iemImportBorderLayoutView'"/>
+						<setting key="selectiemExportBorderLayoutView_eval" type="String" value="'iemExportBorderLayoutView'"/>
+
+						<virtual-sockets>
+							<input id="selectiemImportBorderLayoutView" type="java.lang.Object"/>
+							<input id="selectiemExportBorderLayoutView" type="java.lang.Object"/>
+						</virtual-sockets>
+					</widget>
+
+					<setting key="northDisabled" type="Boolean" value="false"/>
+					<setting key="southDisabled" type="Boolean" value="false"/>
+					<setting key="centerDisabled" type="Boolean" value="true"/>
+					<setting key="westDisabled" type="Boolean" value="true"/>
+					<setting key="eastDisabled" type="Boolean" value="true"/>
+					<setting key="northHeight" type="String" value="50%"/>
+					<setting key="southHeight" type="String" value="50%"/>
+					<setting key="broadcastHorizontalResize" type="Boolean" value="true"/>
+					<setting key="opaqueBG" type="Boolean" value="false"/>
+					<setting key="autoCloseWest" type="Boolean" value="true"/>
+				</widget>
+
+				<setting key="selectIemPerspective_eval" type="String">'iemMainBorderLayout'</setting>
+				<setting key="selectHistoryPerspective_eval" type="String">'iemodule_tree_type_history'</setting>
+				<virtual-sockets>
+					<input id="selectIemPerspective" type="java.lang.Object" visibility="external"/>
+					<input id="selectHistoryPerspective" type="java.lang.Object" visibility="external"/>
+				</virtual-sockets>
+			</widget>
+
+			<setting key="northBorder" type="String" value="none"/>
+			<setting key="broadcastHorizontalResize" type="Boolean" value="true"/>
+			<setting key="eastDisabled" type="Boolean" value="true"/>
+			<setting key="eastBorder" type="String" value="none"/>
+			<setting key="westCollapsible" type="Boolean" value="true"/>
+			<setting key="northCollapsible" type="Boolean" value="true"/>
+			<setting key="border" type="String" value="none"/>
+			<setting key="centerBorder" type="String" value="none"/>
+			<setting key="westDisabled" type="Boolean" value="false"/>
+			<setting key="opaqueBG" type="String" value="true"/>
+			<setting key="westBorder" type="String" value="none"/>
+			<setting key="southBorder" type="String" value="none"/>
+			<setting key="southDisabled" type="Boolean" value="true"/>
+			<setting key="eastWidth" type="String" value="25%"/>
+			<setting key="northDisabled" type="Boolean" value="true"/>
+			<setting key="autoCloseWest" type="Boolean" value="true"/>
+			<setting key="southCollapsible" type="Boolean" value="true"/>
+			<setting key="westWidth" type="String" value="250px"/>
+			<setting key="eastCollapsible" type="Boolean" value="true"/>
+			<setting key="perspectiveImageUrl" type="String" value="/cng/images/import-export-perspective.png"/>
+		</widget>
+	</widget-extension>
+
+	<widget-connection sourceWidgetId="iemExplorerTree" outputId="nodeSelected"
+	                   targetWidgetId="iemExplorerTreeSelectionFirstProxy" inputId="element"/>
+
+	<widget-connection sourceWidgetId="iemExplorerTreeSelectionFirstProxy" outputId="iem"
+	                   targetWidgetId="iem_content_container" inputId="selectIemPerspective"/>
+
+	<widget-connection sourceWidgetId="iemExplorerTreeSelectionFirstProxy" outputId="history"
+	                   targetWidgetId="iem_content_container" inputId="selectHistoryPerspective"/>
+
+	<widget-connection sourceWidgetId="iemExplorerTreeSelectionFirstProxy" outputId="iem"
+	                   targetWidgetId="iemExplorerTreeSelectionProxy" inputId="element"/>
+
+	<widget-connection sourceWidgetId="iemExplorerTree" outputId="nodeSelected"
+	                   targetWidgetId="historyConditionEvaluator" inputId="input"/>
+
+	<widget-connection sourceWidgetId="iemExplorerTreeSelectionProxy" outputId="import"
+	                   targetWidgetId="iemViewSwitcher" inputId="selectiemImportBorderLayoutView"/>
+
+	<widget-connection sourceWidgetId="iemExplorerTreeSelectionProxy" outputId="export"
+	                   targetWidgetId="iemViewSwitcher" inputId="selectiemExportBorderLayoutView"/>
+
+	<widget-connection sourceWidgetId="cloudpopupwidget" outputId="chosenImportObject"
+	                   targetWidgetId="importPathWidget" inputId="inputChoosenObject"/>
+
+	<widget-connection sourceWidgetId="cloudpopupwidget" outputId="chosenExportObject"
+	                   targetWidgetId="exportPathWidget" inputId="inputChoosenObject"/>
+
+	<widget-connection sourceWidgetId="iemViewSwitcher" outputId="selectedViews"
+	                   targetWidgetId="exportPathWidget" inputId="selectedView"/>
+
+	<widget-connection sourceWidgetId="iemViewSwitcher" outputId="selectedViews"
+	                   targetWidgetId="importPathWidget" inputId="selectedView"/>
+
+	<widget-connection sourceWidgetId="importStorageConfigWidget" outputId="outputObject"
+	                   targetWidgetId="storageConfigEditorArea" inputId="inputObject"/>
+
+	<widget-connection sourceWidgetId="storageConfigEditorArea" outputId="objectSaved"
+	                   targetWidgetId="importStorageConfigWidget" inputId="objectSaved"/>
+
+	<widget-connection sourceWidgetId="importStorageConfigWidget" outputId="reset"
+	                   targetWidgetId="storageConfigEditorArea" inputId="reset"/>
+
+	<widget-connection sourceWidgetId="importStorageConfigWidget" outputId="closeEast"
+	                   targetWidgetId="storageConfigBorderLayout" inputId="closeEast"/>
+
+	<widget-connection sourceWidgetId="importStorageConfigWidget" outputId="openEast"
+	                   targetWidgetId="storageConfigBorderLayout" inputId="openEast"/>
+
+	<widget-connection sourceWidgetId="importStorageConfigWidget" outputId="reset"
+	                   targetWidgetId="importPathWidget" inputId="reset"/>
+
+	<widget-connection sourceWidgetId="importStorageConfigWidget" outputId="outputStorageConfigData"
+	                   targetWidgetId="importPathWidget" inputId="inputStorageConfigData"/>
+
+	<widget-connection sourceWidgetId="importStorageConfigWidget" outputId="reset"
+	                   targetWidgetId="exportPathWidget" inputId="reset"/>
+
+	<widget-connection sourceWidgetId="importStorageConfigWidget" outputId="reset"
+	                   targetWidgetId="sourceselectorwidget" inputId="reset"/>
+
+	<widget-connection sourceWidgetId="importStorageConfigWidget" outputId="reset"
+	                   targetWidgetId="exportScopes" inputId="reset"/>
+
+	<widget-connection sourceWidgetId="importStorageConfigWidget" outputId="outputStorageConfigData"
+	                   targetWidgetId="sourceselectorwidget" inputId="inputStorageConfigData"/>
+
+	<widget-connection sourceWidgetId="importStorageConfigWidget" outputId="outputStorageConfigData"
+	                   targetWidgetId="exportPathWidget" inputId="inputStorageConfigData"/>
+
+	<widget-connection sourceWidgetId="importStorageConfigWidget" outputId="outputStorageTypeData"
+	                   targetWidgetId="importPathWidget" inputId="inputStorageTypeData"/>
+
+	<widget-connection sourceWidgetId="importStorageConfigWidget" outputId="outputStorageTypeData"
+	                   targetWidgetId="exportPathWidget" inputId="inputStorageTypeData"/>
+</widgets>

@@ -1,0 +1,66 @@
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widgets.xsd">
+
+	<widget-extension widgetId="iemViewSwitcher">
+		<widget id="iemExportBorderLayoutView" widgetDefinitionId="com.hybris.cockpitng.borderlayout"
+		        slotId="views" title="export.view">
+				<widget id="startExportBorderLayoutView" widgetDefinitionId="com.hybris.cockpitng.borderlayout"
+				        slotId="centerSlot">
+					<widget id="exportScopes"
+					        widgetDefinitionId="com.aimprosoft.importexportbackoffice.widgets.scopeswidget"
+					        slotId="headerSlot"/>
+					<widget id="sourceselectorwidget"
+					        widgetDefinitionId="com.aimprosoft.importexportbackoffice.widgets.sourceselectorwidget.sourceselectorwidget"
+					        slotId="centerSlot" template="false">
+					</widget>
+					<widget id="exportPathWidget"
+					        widgetDefinitionId="com.aimprosoft.importexportbackoffice.widgets.exportpathwidget"
+					        slotId="bottomSlot">
+						<setting key="isExport" type="Boolean" value="true"/>
+					</widget>
+					<setting key="northDisabled" type="Boolean" value="false"/>
+					<setting key="southDisabled" type="Boolean" value="false"/>
+					<setting key="westDisabled" type="Boolean" value="true"/>
+					<setting key="eastDisabled" type="Boolean" value="true"/>
+					<setting key="northCollapsible" type="Boolean" value="false"/>
+					<setting key="southCollapsible" type="Boolean" value="false"/>
+					<setting key="northHeight" type="String" value="25%"/>
+					<setting key="southHeight" type="String" value="60%"/>
+					<setting key="opaqueBG" type="Boolean" value="true"/>
+					<setting key="autoCloseWest" type="Boolean" value="true"/>
+					<setting key="northSplittable" type="Boolean" value="false"/>
+					<setting key="southSplittable" type="Boolean" value="false"/>
+				</widget>
+			<setting key="westDisabled" type="Boolean" value="true"/>
+			<setting key="eastDisabled" type="Boolean" value="true"/>
+		</widget>
+	</widget-extension>
+
+	<widget-connection sourceWidgetId="exportScopes" outputId="selectedScope"
+	                   targetWidgetId="exportPathWidget" inputId="selectedScope"/>
+
+	<widget-connection sourceWidgetId="exportScopes" outputId="selectedScope"
+	                   targetWidgetId="sourceselectorwidget" inputId="selectedScope"/>
+
+	<widget-connection sourceWidgetId="sourceselectorwidget" outputId="outputCatalog"
+	                   targetWidgetId="exportPathWidget" inputId="inputCatalog"/>
+
+	<widget-connection sourceWidgetId="sourceselectorwidget" outputId="outputSite"
+	                   targetWidgetId="exportPathWidget" inputId="inputSite"/>
+
+	<widget-connection sourceWidgetId="exportScopes" outputId="outputSelectedExportMediaNeeded"
+	                   targetWidgetId="exportPathWidget" inputId="selectedExportMediaNeeded"/>
+
+	<widget-connection sourceWidgetId="exportPathWidget" outputId="outputExportConfigData"
+	                   targetWidgetId="cloudpopupwidget" inputId="inputExportConfig"/>
+
+	<widget-connection sourceWidgetId="exportPathWidget" outputId="outputSearchData"
+	                   targetWidgetId="historyAdvancedSearchEngine" inputId="searchData"/>
+
+	<widget-connection sourceWidgetId="exportPathWidget" outputId="reset"
+	                   targetWidgetId="sourceselectorwidget" inputId="reset"/>
+
+	<widget-connection sourceWidgetId="exportPathWidget" outputId="reset"
+	                   targetWidgetId="exportScopes" inputId="reset"/>
+
+</widgets>

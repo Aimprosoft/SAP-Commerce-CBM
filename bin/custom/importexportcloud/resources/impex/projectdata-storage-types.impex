@@ -1,0 +1,7 @@
+INSERT_UPDATE StorageType;code[unique=true];name;local;default;authNeeded
+;aWSs3StorageType; Amazon S3;false;false;false
+;dropBoxStorageType;Dropbox;false;false;true
+;localStorageType;Local storage;true;true;false
+
+INSERT_UPDATE LocalStorageConfig;code[unique=true];name;type(code);user(UID)
+;localStorageConfig;Local config;localStorageType;admin

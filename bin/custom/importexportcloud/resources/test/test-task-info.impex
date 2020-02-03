@@ -1,0 +1,28 @@
+$storageConfig = storageConfig(code[default=testStorageConfig])
+$user = user(UID)[default=testUser]
+$exportMediaNeeded = exportMediaNeeded[default=true]
+$migrateMediaNeeded = migrateMediaNeeded[default=false]
+
+INSERT_UPDATE ImportTaskInfo; code[unique = true]; status(code); $user; $storageConfig; $exportMediaNeeded
+                            ; import_task_1      ; Started
+                            ; import_task_2      ; Downloading
+                            ; import_task_3      ; Downloaded
+                            ; import_task_4      ; Uploading
+                            ; import_task_5      ; Uploaded
+                            ; import_task_6      ; Importing
+                            ; import_task_7      ; Imported
+                            ; import_task_8      ; Exporting
+                            ; import_task_9      ; Exported
+                            ; import_task_10     ; Failed
+
+INSERT_UPDATE ExportTaskInfo; code[unique = true]; status(code); $user; $storageConfig; $exportMediaNeeded;$migrateMediaNeeded
+                            ; export_task_1      ; Started
+                            ; export_task_2      ; Downloading
+                            ; export_task_3      ; Downloaded
+                            ; export_task_4      ; Uploading
+                            ; export_task_5      ; Uploaded
+                            ; export_task_6      ; Importing
+                            ; export_task_7      ; Imported
+                            ; export_task_8      ; Exporting
+                            ; export_task_9      ; Exported
+                            ; export_task_10     ; Failed

@@ -1,0 +1,121 @@
+@import "cockpitng-globals.scss";
+
+$iem-widget-popup-bottom-toolbar--height: 80px;
+$iem-widget-cloudobject-header--height: 60px;
+$iem-widget-cloudobject-separator--height: 2*$container-spacing-default__third;
+$iem-widget-footer-gutter: 2*$container-spacing-default__third;
+$iem-widget-gutter: 2*$container-spacing-default__third;
+$iem-widget-footer--border: 1px solid $grey__default--300;
+
+$iem-widget-cloudobject-list-container__checkbox-label--margin-left: 3px;
+$iem-widget-cloudobject-listbox-header__column-header--padding: 4px;
+$iem-widget-cloudobject-listbox-header__comment--margin-top: -3px;
+
+$my_popup__navigation--bckg: white;
+$my_popup__info--border-color: grey;
+$window-highlighted__navigation-button--color: grey;
+
+.yw-common-popup-content {
+  padding: 5px;
+  height: calc(100% - 62px);
+}
+
+.yw-common-popup-navigation {
+  background: none repeat scroll 0 0 $my_popup__navigation--bckg;
+  border-top: 1px solid $my_popup__info--border-color;
+  height: 61px;
+
+  .yw-left-pack, .yw-right-pack {
+    .yw-component-wrapper {
+      display: inline-block;
+      padding: 10px;
+    }
+  }
+  .yw-right-pack {
+    position: absolute;
+    right: 0;
+    top: 0;
+    .yw-component-wrapper {
+      padding-left: 0;
+    }
+  }
+  .yw-left-pack {
+    .yw-component-wrapper {
+      padding-right: 0;
+    }
+  }
+
+}
+
+
+//implementing the footer buttons styling
+.iem-widget-footer{
+  padding: $iem-widget-footer-gutter;
+  text-align: right;
+  border-top: $iem-widget-footer--border;
+}
+
+.iem-widget-cloudobject-configuration-footer,
+.iem-widget-footer{
+  height: $iem-widget-popup-bottom-toolbar--height;
+}
+
+.iem-widget-cloudobject-configuration--separator{
+  height: $iem-widget-cloudobject-separator--height;
+}
+
+.iem-widget-cloudobject-header{
+  height: $iem-widget-cloudobject-header--height;
+}
+
+.iem-widget-cloudobject-header,
+.iem-widget-cloudobject-list{
+  padding-left: $iem-widget-gutter;
+  padding-right: $iem-widget-gutter;
+}
+
+//overwrite styling from backoffice - as the case is not implemented by the framework
+//move some inline styling in the scss file
+.iem-widget-cloudobject-list-container__checkbox.z-checkbox {
+  label{
+    display: inline;
+    padding-right: 0;
+    margin-left: $iem-widget-cloudobject-list-container__checkbox-label--margin-left;
+  }
+
+  >input{
+    width: 0;
+  }
+
+}
+
+.iem-widget-cloudobject-listbox-header .z-column-content{
+  padding: $iem-widget-cloudobject-listbox-header__column-header--padding;
+}
+
+.iem-widget-cloudobject-listbox-header__comment .z-column-content{
+  margin-top: $iem-widget-cloudobject-listbox-header__comment--margin-top;
+}
+
+.iem-widget-cloudobject-configuration,
+.iem-widget-cloudobject-list-container{
+  border-top: $iem-widget-footer--border;
+}
+
+//overwriting grid styling to match the listbox - header
+.iem-widget-cloudobject-list-container .z-grid-header{
+  background: transparent;
+}
+
+.iem-widget-cloudobject-list{
+  height: calc(100% - #{$iem-widget-popup-bottom-toolbar--height + 2*$iem-widget-cloudobject-separator--height + $iem-widget-cloudobject-header--height});
+}
+
+.ye-processes-settings-container-range-list-label {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}

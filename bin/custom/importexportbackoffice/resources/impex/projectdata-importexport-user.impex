@@ -1,0 +1,4 @@
+$defaultPassword=1234
+
+INSERT_UPDATE Employee;UID[unique=true];password[default=$defaultPassword];description;name;groups(uid);sessionLanguage(isocode);sessionCurrency(isocode)
+;cbmuser;;CBM User;CBM User;CBMgroup;en;EUR

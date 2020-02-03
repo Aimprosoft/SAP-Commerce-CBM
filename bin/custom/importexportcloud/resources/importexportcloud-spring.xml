@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <import resource="/importexportcloud-spring/importexportcloud-export-spring.xml"/>
+
+    <import resource="/importexportcloud-spring/importexportcloud-storage-spring.xml"/>
+
+    <import resource="/importexportcloud-spring/importexportcloud-task-spring.xml"/>
+
+    <!-- IMPORT -->
+
+    <alias name="defaultImportFacade" alias="importFacade"/>
+    <bean name="defaultImportFacade"
+          class="com.aimprosoft.importexportcloud.facades.impl.DefaultImportFacade">
+        <property name="importService" ref="importService"/>
+        <property name="taskInfoService" ref="taskInfoService"/>
+    </bean>
+
+    <!-- END IMPORT BLOCK -->
+
+    <alias name="defaultIemCmsSiteService" alias="iemCmsSiteService"/>
+    <bean id="defaultIemCmsSiteService"
+          class="com.aimprosoft.importexportcloud.service.impl.DefaultIemCMSSiteService"
+          parent="defaultCMSSiteService">
+        <property name="iemSessionService" ref="iemSessionService"/>
+    </bean>
+
+    <alias name="defaultIemCatalogVersionService" alias="iemCatalogVersionService"/>
+    <bean id="defaultIemCatalogVersionService"
+          class="com.aimprosoft.importexportcloud.service.impl.DefaultIemCatalogVersionService"
+          parent="defaultCatalogVersionService">
+        <property name="iemSessionService" ref="iemSessionService"/>
+        <property name="iemCMSSiteService" ref="iemCmsSiteService"/>
+        <property name="stagedCatalogVersionName" value="${staged.catalog.version.name}"/>
+    </bean>
+
+    <alias name="defaultIemSessionService" alias="iemSessionService"/>
+    <bean id="defaultIemSessionService"
+          class="com.aimprosoft.importexportcloud.service.impl.DefaultIemSessionService"
+          parent="defaultSessionService">
+    </bean>
+</beans>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget-definition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widget-definition.xsd"
+                   id="com.aimprosoft.importexportbackoffice.widgets.storageconfigwidget">
+    <name>Storage Type</name>
+    <description>Storage connection configuration widget</description>
+    <defaultTitle>Storage Configuration</defaultTitle>
+    <author>aimprosoft</author>
+    <version>0.1</version>
+
+    <sockets>
+        <input id="objectSaved" type="java.lang.Object"/>
+        <output id="outputObject" type="com.aimprosoft.importexportcloud.model.StorageConfigModel"/>
+        <output id="outputStorageConfigData" type="com.aimprosoft.importexportcloud.facades.data.StorageConfigData"/>
+        <output id="reset" type="com.aimprosoft.importexportcloud.facades.data.StorageConfigData"/>
+        <output id="outputStorageTypeData" type="com.aimprosoft.importexportcloud.facades.data.StorageTypeData"/>
+    </sockets>
+
+    <controller class="com.aimprosoft.importexportbackoffice.widgets.storageconfigwidget.StorageConfigWidgetController"/>
+
+    <keywords>
+        <keyword>Import Export Module</keyword>
+    </keywords>
+</widget-definition>

@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		  xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<enumtypes>
+		<enumtype code="TaskInfoStatus">
+			<value code="Started"/>
+			<value code="Downloading"/>
+			<value code="Downloaded"/>
+			<value code="Uploading"/>
+			<value code="Uploaded"/>
+			<value code="Importing"/>
+			<value code="Imported"/>
+			<value code="Exporting"/>
+			<value code="Exported"/>
+			<value code="Failed"/>
+		</enumtype>
+		<enumtype code="TaskInfoScope">
+			<value code="CatalogScope"/>
+			<value code="SiteScope"/>
+			<value code="ItemScope"/>
+		</enumtype>
+	</enumtypes>
+
+	<relations>
+		<relation code="StorageConfig2User" localized="false">
+			<sourceElement type="User" cardinality="one" qualifier="user">
+				<modifiers read="true" write="true" search="true" optional="false"/>
+			</sourceElement>
+			<targetElement type="StorageConfig" cardinality="many" qualifier="storageConfigs">
+				<modifiers read="true" write="true" search="true" optional="true" partof="true"/>
+			</targetElement>
+		</relation>
+
+		<relation code="TaskInfo2User" localized="false">
+			<sourceElement type="User" cardinality="one" qualifier="user">
+				<modifiers read="true" write="true" search="true" optional="false"/>
+			</sourceElement>
+			<targetElement type="TaskInfo" cardinality="many" qualifier="tasks">
+				<modifiers read="true" write="true" search="true" optional="true" partof="true"/>
+			</targetElement>
+		</relation>
+	</relations>
+
+	<itemtypes>
+		<itemtype code="StorageType"
+				  extends="GenericItem">
+			<deployment table="StorageType" typecode="20000"/>
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<description>Code of the storage type</description>
+					<modifiers initial="true" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="name" type="java.lang.String">
+					<description>Name of the storage type</description>
+					<modifiers initial="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="local" type="java.lang.Boolean">
+					<description>Determines if storage type is local</description>
+					<modifiers optional="false"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="default" type="java.lang.Boolean">
+					<description>Determines if storage is the first in drop down list(default)</description>
+					<modifiers optional="false"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="authNeeded" type="java.lang.Boolean">
+					<description>Determines if authorization is needed</description>
+					<modifiers optional="false"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="codeIDX" unique="true">
+					<key attribute="code" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="StorageConfig"
+				  extends="GenericItem"
+				  abstract="true">
+			<deployment table="StorageConfig" typecode="20001"/>
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<description>Code of the storage type</description>
+					<modifiers initial="true" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="name" type="java.lang.String">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="type" type="StorageType">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="isConnected" type="java.lang.Boolean">
+					<persistence type="property"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<modifiers optional="true"/>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="codeIDX" unique="true">
+					<key attribute="code" />
+                </index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="AppKeyBasedStorageConfig"
+				  extends="StorageConfig"
+				  abstract="true">
+		<attributes>
+			<attribute qualifier="appKey" type="java.lang.String">
+				<persistence type="property"/>
+				<modifiers optional="false"/>
+			</attribute>
+			<attribute qualifier="encodedAppSecret" type="java.lang.String">
+				<persistence type="property">
+					<columntype>
+						<value>HYBRIS.LONG_STRING</value>
+					</columntype>
+				</persistence>
+				<modifiers encrypted="true" optional="false"/>
+			</attribute>
+		</attributes>
+		</itemtype>
+
+		<itemtype code="LocalStorageConfig"
+				  extends="StorageConfig">
+			<attributes>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="AWSs3StorageConfig"
+				  extends="AppKeyBasedStorageConfig">
+			<attributes>
+				<attribute qualifier="region" type="java.lang.String">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="bucketName" type="java.lang.String">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="DropBoxStorageConfig"
+				  extends="AppKeyBasedStorageConfig">
+			<attributes>
+				<attribute qualifier="accessToken" type="java.lang.String">
+					<modifiers optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="TaskInfo"
+				  extends="GenericItem"
+				  abstract="true">
+			<deployment table="TaskInfo" typecode="20100"/>
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<description>Code of the task</description>
+					<modifiers initial="true" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="cronJob" type="CronJob">
+					<description>Job is used for task</description>
+					<modifiers optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="storageConfig" type="StorageConfig">
+					<description>Storage config responsible for connection</description>
+					<modifiers optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="storageConfigInfo" type="java.lang.String">
+					<description>StorageConfig.storageType.name : StorageConfig.name to display in editor area </description>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="status" type="TaskInfoStatus">
+					<description>Status for the current Task</description>
+					<modifiers optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="externalPath" type="java.lang.String">
+					<description>External path is used for import or export process</description>
+					<modifiers optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="finishedDate" type="java.util.Date">
+					<description>Finished date of the task</description>
+					<modifiers optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="exportMediaNeeded" type="boolean">
+					<description>Determines if export media is needed</description>
+					<modifiers optional="false"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="codeIDX" unique="true">
+					<key attribute="code"/>
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="ImportTaskInfo"
+				  extends="TaskInfo">
+			<attributes>
+
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ExportTaskInfo"
+				  extends="TaskInfo">
+			<attributes>
+				<attribute qualifier="taskScope" type="TaskInfoScope">
+					<description>Task scope is used during export</description>
+					<modifiers optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="catalogVersion" type="CatalogVersion">
+					<description>Catalog Version is used during export</description>
+					<modifiers optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="site" type="CMSSite">
+					<description>Cms site is used during export</description>
+					<modifiers optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="migrateMediaNeeded" type="boolean">
+					<description>Determines if migrate media is needed</description>
+					<modifiers optional="false"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="IemExportConfiguration"
+				  extends="GenericItem">
+			<deployment table="IemExportConfigurations" typecode="20003"/>
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<description>Unique code for export configuration</description>
+					<modifiers optional="false" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="description" type="java.lang.String">
+					<description>Optional description</description>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="classificationTypeCodes" type="StringCollection">
+					<description>Additional composed type codes for classification catalog exporting</description>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="productTypeCodes" type="StringCollection">
+					<description>Additional composed type codes for product catalog exporting</description>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="contentTypeCodes" type="StringCollection">
+					<description>Additional composed type codes for content catalog exporting</description>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="siteTypeCodes" type="StringCollection">
+					<description>Additional composed type codes for site exporting</description>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="codeIDX" unique="true">
+					<key attribute="code"/>
+				</index>
+			</indexes>
+		</itemtype>
+
+	</itemtypes>
+</items>

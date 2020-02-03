@@ -1,0 +1,179 @@
+<!--  EXPORT  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<alias name="defaultExportConfigurationService" alias="exportConfigurationService"/>
+	<bean id="defaultExportConfigurationService"
+	      class="com.aimprosoft.importexportcloud.export.impl.DefaultExportConfigurationService">
+		<property name="exportConfigurationDao" ref="exportConfigurationGenericDao"/>
+	</bean>
+
+	<alias name="defaultExportConfigurationGenericDao" alias="exportConfigurationGenericDao"/>
+	<bean id="defaultExportConfigurationGenericDao" class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+		<constructor-arg value="IemExportConfiguration"/>
+	</bean>
+
+	<alias name="defaultExportScriptGeneratorService" alias="exportScriptGeneratorService"/>
+	<bean id="defaultExportScriptGeneratorService"
+	      class="com.aimprosoft.importexportcloud.export.impl.DefaultExportScriptGeneratorService">
+		<property name="modelService" ref="modelService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="exportConfigurationService" ref="exportConfigurationService"/>
+		<property name="composedTypesGeneratorsMap" ref="composedTypesGeneratorsMap"/>
+		<property name="noMediaScriptModifier" ref="noMediaExportScriptModifier"/>
+		<property name="mediaScriptModifier" ref="mediaExportScriptModifier"/>
+	</bean>
+
+	<bean id="abstractComposedTypesProducer"
+	      class="com.aimprosoft.importexportcloud.export.generators.impl.AbstractComposedTypesGenerator" abstract="true">
+		<property name="exportConfigurationService" ref="exportConfigurationService"/>
+	</bean>
+
+	<alias name="defaultContentComposedTypesProducer" alias="contentComposedTypesProducer"/>
+	<bean id="defaultContentComposedTypesProducer"
+	      class="com.aimprosoft.importexportcloud.export.generators.impl.ContentComposedTypesGenerator"
+	      parent="abstractComposedTypesProducer">
+		<property name="exportConfigurationService" ref="exportConfigurationService"/>
+	</bean>
+
+	<alias name="defaultProductComposedTypesProducer" alias="productComposedTypesProducer"/>
+	<bean id="defaultProductComposedTypesProducer"
+	      class="com.aimprosoft.importexportcloud.export.generators.impl.ProductComposedTypesGenerator"
+	      parent="abstractComposedTypesProducer">
+		<property name="exportConfigurationService" ref="exportConfigurationService"/>
+	</bean>
+
+	<alias name="defaultClassificationComposedTypesProducer" alias="classificationComposedTypesProducer"/>
+	<bean id="defaultClassificationComposedTypesProducer"
+	      class="com.aimprosoft.importexportcloud.export.generators.impl.ClassificationComposedTypesGenerator"
+	      parent="abstractComposedTypesProducer">
+		<property name="exportConfigurationService" ref="exportConfigurationService"/>
+	</bean>
+
+	<util:list id="siteProducers">
+		<ref bean="defaultContentComposedTypesProducer"/>
+		<ref bean="defaultProductComposedTypesProducer"/>
+		<ref bean="defaultClassificationComposedTypesProducer"/>
+	</util:list>
+
+	<alias name="defaultSiteComposedTypesProducer" alias="siteComposedTypesProducer"/>
+	<bean id="defaultSiteComposedTypesProducer"
+	      class="com.aimprosoft.importexportcloud.export.generators.impl.SiteComposedTypesGenerator"
+	      parent="abstractComposedTypesProducer">
+		<property name="generators" ref="siteProducers"/>
+		<property name="exportConfigurationService" ref="exportConfigurationService"/>
+	</bean>
+
+	<util:map id="composedTypesGeneratorsMap">
+		<entry key="#{T(de.hybris.platform.cms2.model.site.CMSSiteModel)}" value-ref="siteComposedTypesProducer"/>
+		<entry key="#{T(de.hybris.platform.cms2.model.contents.ContentCatalogModel)}" value-ref="contentComposedTypesProducer"/>
+		<entry key="#{T(de.hybris.platform.catalog.model.CatalogModel)}" value-ref="productComposedTypesProducer"/>
+		<entry key="#{T(de.hybris.platform.catalog.model.classification.ClassificationSystemModel)}"
+		       value-ref="classificationComposedTypesProducer"/>
+	</util:map>
+
+	<bean id="onlineCatalogEntriesFilter" class="com.aimprosoft.importexportcloud.export.filters.impl.OnlineCatalogEntriesFilter">
+		<property name="filesToSkip">
+			<set>
+				<value>SolrFacetSearchConfig2CatalogVersionRelation.csv</value>
+				<value>PageTemplate.csv</value>
+				<value>EmailPageTemplate.csv</value>
+			</set>
+		</property>
+		<property name="filesToFilter">
+			<set>
+				<value>CatalogUnawareMedia.csv</value>
+			</set>
+		</property>
+		<property name="onlineCatalogVersionName" value="#{':'}${online.catalog.version.name}"/>
+	</bean>
+
+	<bean id="classificationCatalogRelationFilter"
+	      class="com.aimprosoft.importexportcloud.export.filters.impl.ClassificationCatalogRelationFilter">
+		<property name="filesToFilter">
+			<set>
+				<value>CategoryCategoryRelation.csv</value>
+			</set>
+		</property>
+	</bean>
+
+	<bean id="catalogsFileFilter" class="com.aimprosoft.importexportcloud.export.filters.impl.CatalogsFileFilter">
+		<property name="iemCmsSiteService" ref="iemCmsSiteService"/>
+	</bean>
+
+	<bean id="catalogRelatedEntriesFilter"
+	      class="com.aimprosoft.importexportcloud.export.filters.impl.CatalogRelatedEntriesFilter">
+		<property name="exportFileFilters">
+			<list>
+				<ref bean="catalogsFileFilter"/>
+				<ref bean="classificationCatalogRelationFilter"/>
+			</list>
+		</property>
+		<property name="filesToFilter">
+			<set>
+				<value>CategoryCategoryRelation.csv</value>
+				<value>Media.csv</value>
+			</set>
+		</property>
+	</bean>
+
+	<alias name="defaultExportFacade" alias="exportFacade"/>
+	<bean name="defaultExportFacade" class="com.aimprosoft.importexportcloud.facades.impl.DefaultExportFacade">
+		<property name="exportScriptGeneratorService" ref="exportScriptGeneratorService"/>
+		<property name="exportService" ref="exportService"/>
+		<property name="taskInfoService" ref="taskInfoService"/>
+		<property name="exportResultProcessor" ref="exportResultProcessor"/>
+		<property name="iemCatalogVersionService" ref="iemCatalogVersionService"/>
+	</bean>
+
+	<alias name="defaultExportResultProcessor" alias="exportResultProcessor"/>
+	<bean id="defaultExportResultProcessor"
+	      class="com.aimprosoft.importexportcloud.export.impl.DefaultExportResultProcessor">
+		<property name="modelService" ref="modelService"/>
+		<property name="taskInfoService" ref="taskInfoService"/>
+		<property name="exportFileFilters">
+			<list>
+				<ref bean="onlineCatalogEntriesFilter"/>
+				<ref bean="catalogRelatedEntriesFilter"/>
+			</list>
+		</property>
+		<property name="exportFileMergeStrategy" ref="exportFileMergeStrategy"/>
+	</bean>
+
+	<alias name="defaultExportFileMergeStrategy" alias="exportFileMergeStrategy"/>
+	<bean id="defaultExportFileMergeStrategy" class="com.aimprosoft.importexportcloud.export.impl.DefaultExportFileMergeStrategy"/>
+
+	<bean id="commonScriptModifier" class="com.aimprosoft.importexportcloud.service.script.modifiers.CommonScriptModifier"/>
+	<bean id="productScriptModifier"
+	      class="com.aimprosoft.importexportcloud.service.script.modifiers.ProductScriptModifier"/>
+	<bean id="solrScriptModifier" class="com.aimprosoft.importexportcloud.service.script.modifiers.SolrScriptModifier"/>
+	<bean id="contentScriptModifier"
+	      class="com.aimprosoft.importexportcloud.service.script.modifiers.ContentScriptModifier"/>
+
+	<bean id="abstractExportScriptModifier" class="com.aimprosoft.importexportcloud.service.script.modifiers.ExportScriptModifier"
+	      abstract="true">
+		<property name="exportMedia" value="false"/>
+		<property name="iemScriptModifiers">
+			<set>
+				<ref bean="commonScriptModifier"/>
+				<ref bean="productScriptModifier"/>
+				<ref bean="solrScriptModifier"/>
+				<ref bean="contentScriptModifier"/>
+			</set>
+		</property>
+	</bean>
+
+	<bean id="noMediaExportScriptModifier" class="com.aimprosoft.importexportcloud.service.script.modifiers.ExportScriptModifier"
+	      parent="abstractExportScriptModifier">
+		<property name="exportMedia" value="false"/>
+	</bean>
+
+	<bean id="mediaExportScriptModifier" class="com.aimprosoft.importexportcloud.service.script.modifiers.ExportScriptModifier"
+	      parent="noMediaExportScriptModifier">
+		<property name="exportMedia" value="true"/>
+	</bean>
+
+</beans>

@@ -1,0 +1,18 @@
+@import "cockpitng-globals.scss";
+
+.iem-main-layout {
+    padding: 20px 40px 0 40px;
+}
+
+.z-combobox-pp,
+.z-combobox-content {
+    display: inline-block;
+    max-height: 120px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.z-comboitem,
+.z-comboitem a,
+.z-comboitem a:visited {
+    line-height: 30px;
+}

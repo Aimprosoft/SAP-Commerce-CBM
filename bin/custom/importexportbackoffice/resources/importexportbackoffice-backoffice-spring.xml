@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="importexportbackofficeLabelLocator" class="com.hybris.cockpitng.util.labels.ResourcesLabelLocator" scope="singleton"
+          init-method="init" lazy-init="false">
+        <property name="location" value="/importexportbackoffice-backoffice-labels/"/>
+        <property name="name" value="labels"/>
+    </bean>
+
+    <bean id="exportTaskInfoNullListCellRenderer"
+          class="com.aimprosoft.importexportbackoffice.renderers.ExportTaskInfoNullListCellRenderer"
+          parent="defaultListCellRenderer">
+    </bean>
+
+    <alias name="defaultWidgetHelper" alias="widgetHelper"/>
+    <bean id="defaultWidgetHelper" class="com.aimprosoft.importexportbackoffice.widgets.storageconfigwidget.DefaultWidgetHelper">
+        <property name="storageConfigFacade" ref="storageConfigFacade"/>
+        <property name="widgetHandlerMap">
+            <map key-type="java.lang.String" value-type="com.aimprosoft.importexportbackoffice.widgets.handlers.WidgetHandler">
+                <entry key="ConfigSelect" value-ref="configSelectWidgetHandler" />
+                <entry key="TypeSelect" value-ref="storageTypeSelectWidgetHandler" />
+                <entry key="Connect" value-ref="connectWidgetHandler" />
+                <entry key="Disconnect" value-ref="disconnectWidgetHandler" />
+            </map>
+        </property>
+    </bean>
+
+    <alias name="defaultPreAuthWidgetHandler" alias="preAuthWidgetHandler"/>
+    <bean id="defaultPreAuthWidgetHandler"
+          class="com.aimprosoft.importexportbackoffice.widgets.handlers.impl.DefaultPreAuthWidgetHandler">
+        <property name="sessionService" ref="sessionService"/>
+        <property name="cloudStorageFacade" ref="cloudStorageFacade"/>
+        <property name="notificationService" ref="notificationService"/>
+        <property name="dropboxConnectionProvider" ref="dropboxConnectionProvider"/>
+    </bean>
+
+    <alias name="defaultConnectWidgetHandler" alias="connectWidgetHandler"/>
+    <bean id="defaultConnectWidgetHandler"
+          class="com.aimprosoft.importexportbackoffice.widgets.handlers.impl.DefaultConnectWidgetHandler">
+        <property name="notificationService" ref="notificationService"/>
+        <property name="cloudStorageFacade" ref="cloudStorageFacade"/>
+        <property name="storageConfigFacade" ref="storageConfigFacade"/>
+        <property name="widgetHelper" ref="widgetHelper"/>
+    </bean>
+
+    <alias name="defaultDisconnectWidgetHandler" alias="disconnectWidgetHandler"/>
+    <bean id="defaultDisconnectWidgetHandler"
+          class="com.aimprosoft.importexportbackoffice.widgets.handlers.impl.DefaultDisconnectWidgetHandler">
+        <property name="notificationService" ref="notificationService"/>
+        <property name="cloudStorageFacade" ref="cloudStorageFacade"/>
+        <property name="storageConfigFacade" ref="storageConfigFacade"/>
+        <property name="widgetHelper" ref="widgetHelper"/>
+    </bean>
+
+    <alias name="defaultConfigSelectWidgetHandler" alias="configSelectWidgetHandler"/>
+    <bean id="defaultConfigSelectWidgetHandler"
+          class="com.aimprosoft.importexportbackoffice.widgets.handlers.impl.DefaultConfigSelectWidgetHandler">
+        <property name="sessionService" ref="sessionService"/>
+        <property name="cloudStorageFacade" ref="cloudStorageFacade"/>
+        <property name="notificationService" ref="notificationService"/>
+        <property name="storageConfigFacade" ref="storageConfigFacade"/>
+        <property name="widgetHelper" ref="widgetHelper"/>
+        <property name="preAuthWidgetHandler" ref="preAuthWidgetHandler"/>
+    </bean>
+
+    <alias name="defaultStorageTypeSelectWidgetHandler" alias="storageTypeSelectWidgetHandler"/>
+    <bean id="defaultStorageTypeSelectWidgetHandler"
+          class="com.aimprosoft.importexportbackoffice.widgets.handlers.impl.DefaultStorageTypeSelectWidgetHandler">
+        <property name="storageConfigFacade" ref="storageConfigFacade"/>
+        <property name="widgetHelper" ref="widgetHelper"/>
+    </bean>
+
+</beans>

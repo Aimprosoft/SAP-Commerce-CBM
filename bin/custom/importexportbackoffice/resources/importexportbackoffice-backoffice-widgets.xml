@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widgets.xsd">
+    <!-- General perspective and settings for module -->
+    <import resource="importexport-backoffice-widgets/importexportbackoffice-widget-general.xml"/>
+
+    <!-- Widgets configurations and views for import view -->
+    <import resource="importexport-backoffice-widgets/importexportbackoffice-widgets-import.xml"/>
+
+    <!-- Widgets configurations and views for export view -->
+    <import resource="importexport-backoffice-widgets/importexportbackoffice-widgets-export.xml"/>
+
+    <!-- Widgets configurations and views for history tree nodes, import and export views -->
+    <import resource="importexport-backoffice-widgets/importexportbackoffice-widgets-history.xml"/>
+
+</widgets>

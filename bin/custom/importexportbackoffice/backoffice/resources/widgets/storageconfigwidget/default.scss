@@ -1,0 +1,59 @@
+@import "cockpitng-globals.scss";
+
+.storage-config-widget-label {
+  color: white;
+}
+
+
+.icon-remove{
+  background-size: 20px !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  width: 40px;
+  height: 40px;
+
+  &.active {
+    background-image: url(/backoffice/cng/images/removeActive.svg) !important;
+  }
+
+  &.disable {
+    background-image: url(/backoffice/cng/images/removeDisable.svg) !important;
+  }
+}
+
+.icon-connect {
+  padding-right: 25px !important;
+  background-size: 20px !important;
+  background-repeat: no-repeat !important;
+  background-position-x: 95% !important;
+  background-position-y: 50% !important;
+  width: 40px;
+
+  &.active {
+    background-image: url(/backoffice/cng/images/connectActive.png) !important;
+  }
+
+  &.disable {
+    background-image: url(/backoffice/cng/images/connectDisable.png) !important;
+  }
+}
+
+.icon-connect:hover {
+  background-position-x: 95% !important;
+  background-position-y: 50% !important;
+}
+
+.icon-disconnect {
+  background-size: 20px !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  width: 40px;
+
+  &.active {
+    background-image: url(/backoffice/cng/images/disconnectActive.png) !important;
+  }
+
+  &.disable {
+    background-image: url(/backoffice/cng/images/disconnectDisable.png) !important;
+  }
+}

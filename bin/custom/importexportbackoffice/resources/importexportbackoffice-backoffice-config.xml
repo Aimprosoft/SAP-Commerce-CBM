@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<config xmlns="http://www.hybris.com/cockpit/config"
+		xmlns:na="http://www.hybris.com/cockpitng/config/notifications"
+		xmlns:perspective-chooser="http://www.hybris.com/cockpitng/config/perspectiveChooser"
+		xmlns:explorer-tree="http://www.hybris.com/cockpitng/config/explorertree"
+		xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea"
+		xmlns:y="http://www.hybris.com/cockpit/config/hybris"
+		xmlns:advanced-search="http://www.hybris.com/cockpitng/config/advancedsearch"
+		xmlns:simple-search="http://www.hybris.com/cockpitng/config/simplesearch"
+		xmlns:list="http://www.hybris.com/cockpitng/component/listView">
+
+	<context component="perspective-chooser" principal="CBMrole">
+		<perspective-chooser:perspective-chooser>
+			<perspective-chooser:authority name="CBMrole">
+				<perspective-chooser:perspective id="importExportBackofficePerspective"/>
+			</perspective-chooser:authority>
+		</perspective-chooser:perspective-chooser>
+	</context>
+
+	<context merge-by="module" parent="auto" component="explorer-tree">
+		<explorer-tree:explorer-tree>
+			<explorer-tree:navigation-node id="hmc_treenode_iem" merge-mode="append">
+				<explorer-tree:type-node code="ImportTaskInfo" id="hmc_type_node_import_task_info" position="1"/>
+				<explorer-tree:type-node code="ExportTaskInfo" id="hmc_type_node_export_task_info" position="2"/>
+			</explorer-tree:navigation-node>
+		</explorer-tree:explorer-tree>
+	</context>
+
+	<context component="iembackoffice-explorer-tree" module="importexportbackoffice">
+		<explorer-tree:explorer-tree>
+			<explorer-tree:navigation-node id="iemodule_tree_navigation_import" />
+			<explorer-tree:navigation-node id="iemodule_tree_navigation_export"/>
+			<explorer-tree:navigation-node id="iemodule_tree_type_history">
+				<explorer-tree:type-node code="ImportTaskInfo" id="hmc_type_node_import_task_info" position="1"/>
+				<explorer-tree:type-node code="ExportTaskInfo" id="hmc_type_node_export_task_info" position="2"/>
+			</explorer-tree:navigation-node>
+		</explorer-tree:explorer-tree>
+	</context>
+
+	<context type="AWSs3StorageConfig" component="editor-area">
+		<editorArea:editorArea>
+			<editorArea:tab name="properties-tab">
+				<editorArea:section name="awss3storageconfig.properties.section">
+					<editorArea:attribute qualifier="name" label="type.awss3storageconfig.name.label"/>
+					<editorArea:attribute qualifier="appKey" label="type.awss3storageconfig.appkey.label"/>
+					<editorArea:attribute qualifier="region" label="type.awss3storageconfig.region.label"/>
+					<editorArea:attribute qualifier="bucketName" label="type.awss3storageconfig.bucketName.label"/>
+					<editorArea:attribute qualifier="encodedAppSecret"
+										  editor="com.aimprosoft.importexportbackoffice.editor.maskedtext"
+										  label="type.awss3storageconfig.encodedappsecret.label"/>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+	<context type="DropBoxStorageConfig" component="editor-area">
+		<editorArea:editorArea>
+			<editorArea:tab name="properties-tab">
+				<editorArea:section name="dropboxstorageconfig.properties.section">
+					<editorArea:attribute qualifier="name" label="type.dropboxstorageconfig.name.label"/>
+					<editorArea:attribute qualifier="appKey" label="type.awss3storageconfig.appkey.label"/>
+					<editorArea:attribute qualifier="encodedAppSecret"
+										  editor="com.aimprosoft.importexportbackoffice.editor.maskedtext"
+										  label="type.awss3storageconfig.encodedappsecret.label"/>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+	<context type="AWSs3StorageConfig" component="editorareaactions">
+		<y:actions>
+			<y:group qualifier="common"/>
+		</y:actions>
+	</context>
+
+	<context type="DropBoxStorageConfig" component="editorareaactions">
+		<y:actions>
+			<y:group qualifier="common"/>
+		</y:actions>
+	</context>
+
+	<!--Notifications-->
+
+	<context merge-by="source" component="notification-area" module="importexportbackoffice" source="importStorageConfigWidget">
+		<na:notification-area>
+			<na:notifications eventType="connectionStatus" level="FAILURE" destination="TOPMOST">
+				<na:message>cloud.storage.connect.failure</na:message>
+				<na:references>
+					<na:reference placeholder="0" label="#root"/>
+				</na:references>
+			</na:notifications>
+			<na:notifications eventType="connectionStatus" level="SUCCESS" destination="TOPMOST">
+				<na:message>cloud.storage.connect.success</na:message>
+			</na:notifications>
+			<na:notifications eventType="storageConfig" level="FAILURE" destination="TOPMOST">
+				<na:message>cloud.storage.config.failure</na:message>
+				<na:references>
+					<na:reference placeholder="0" label="#root"/>
+				</na:references>
+			</na:notifications>
+			<na:notifications eventType="disconnectStatus" level="WARNING" destination="TOPMOST">
+				<na:message>cloud.storage.disconnect.success</na:message>
+			</na:notifications>
+			<na:notifications eventType="disconnectStatus" level="FAILURE" destination="TOPMOST">
+				<na:message>cloud.storage.disconnect.failure</na:message>
+				<na:references>
+					<na:reference placeholder="0" label="#root"/>
+				</na:references>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+	<context merge-by="source" component="notification-area" module="importexportbackoffice" source="importPathWidget">
+		<na:notification-area>
+			<na:notifications eventType="importstart" level="FAILURE" destination="TOPMOST">
+				<na:message>cloud.importstart.failure</na:message>
+				<na:references linksEnabled="true">
+					<na:reference index="0" placeholder="0" label="#root" link="false"/>
+					<na:reference index="1" placeholder="1" label="#root != '' ? T(org.zkoss.util.resource.Labels).getLabel('import.task.fail.details') + #root.code : ' ' " link="#root != null"/>
+				</na:references>
+			</na:notifications>
+			<na:notifications eventType="importstart" level="SUCCESS" destination="TOPMOST">
+				<na:message>cloud.importstart.success</na:message>
+				<na:references linksEnabled="true">
+					<na:reference placeholder="0" label="#root"/>
+				</na:references>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+
+	<context merge-by="source" component="notification-area" module="importexportbackoffice" source="exportPathWidget">
+		<na:notification-area>
+			<na:notifications eventType="exportstart" level="FAILURE" destination="TOPMOST">
+				<na:message>cloud.exportstart.failure</na:message>
+				<na:references linksEnabled="true">
+					<na:reference index="0" placeholder="0" label="#root" link="false"/>
+					<na:reference index="1" placeholder="1" label="#root != '' ? T(org.zkoss.util.resource.Labels).getLabel('export.task.fail.details') + #root.code : ' ' " link="#root != null"/>
+				</na:references>
+			</na:notifications>
+			<na:notifications eventType="exportstart" level="SUCCESS" destination="TOPMOST">
+				<na:message>cloud.exportstart.success</na:message>
+				<na:references>
+					<na:reference placeholder="0" label="#root"/>
+				</na:references>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+
+	<!--End of notifications-->
+
+	<context merge-by="type" parent="GenericItem" type="TaskInfo" component="editor-area">
+		<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+			<editorArea:tab name="hmc.tab.configuration.task.info">
+				<editorArea:section name="hmc.task.info.essential">
+					<editorArea:attribute qualifier="code"/>
+					<editorArea:attribute qualifier="cronJob" readonly="true"/>
+					<editorArea:attribute qualifier="storageConfig"/>
+					<editorArea:attribute qualifier="status"/>
+					<editorArea:attribute qualifier="externalPath"/>
+					<editorArea:attribute qualifier="user"/>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+	<context merge-by="type" parent="GenericItem" type="TaskInfo" component="editor-area" principal="CBMrole">
+		<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+			<editorArea:tab name="hmc.tab.configuration.task.info">
+				<editorArea:section name="hmc.task.info.essential">
+					<editorArea:attribute qualifier="code" readonly="true"/>
+					<editorArea:attribute qualifier="cronJob" readonly="true"/>
+					<editorArea:attribute qualifier="storageConfigInfo" readonly="true"/>
+					<editorArea:attribute qualifier="status" readonly="true"/>
+					<editorArea:attribute qualifier="externalPath" readonly="true"/>
+					<editorArea:attribute qualifier="user" readonly="true"/>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+	<!-- Advanced Search START-->
+
+	<context merge-by="type" parent="GenericItem" type="TaskInfo" component="advanced-search">
+		<advanced-search:advanced-search>
+			<advanced-search:field-list>
+				<advanced-search:field name="code" operator="startsWith" selected="true" sortable="true"/>
+				<advanced-search:field name="status" selected="true"/>
+				<advanced-search:field name="storageConfigInfo"/>
+				<advanced-search:field name="exportMediaNeeded"/>
+				<advanced-search:field name="finishedDate"/>
+				<advanced-search:field name="externalPath"/>
+				<advanced-search:field name="user"/>
+			</advanced-search:field-list>
+		</advanced-search:advanced-search>
+	</context>
+
+	<context merge-by="type" parent="TaskInfo" type="ExportTaskInfo" component="advanced-search">
+		<advanced-search:advanced-search>
+			<advanced-search:field-list>
+				<advanced-search:field name="taskScope"/>
+				<advanced-search:field name="catalog"/>
+				<advanced-search:field name="catalogVersion"/>
+				<advanced-search:field name="site"/>
+				<advanced-search:field name="migrateMediaNeeded"/>
+			</advanced-search:field-list>
+		</advanced-search:advanced-search>
+	</context>
+
+	<!-- Advanced Search END-->
+
+	<!-- Simple Search START-->
+
+	<context merge-by="type" parent="GenericItem" type="TaskInfo" component="simple-search">
+		<simple-search:simple-search>
+			<simple-search:field name="code"/>
+			<simple-search:sort-field name="code" asc="false" />
+		</simple-search:simple-search>
+	</context>
+
+	<!-- Simple Search END-->
+
+	<!-- List View START-->
+
+	<context merge-by="type" parent="GenericItem" type="TaskInfo" component="listview">
+		<list:list-view>
+			<list:column qualifier="code"/>
+			<list:column qualifier="finishedDate"/>
+			<list:column qualifier="user"/>
+			<list:column qualifier="status" position="99"/>
+		</list:list-view>
+	</context>
+
+	<context merge-by="type" parent="TaskInfo" type="ExportTaskInfo" component="listview">
+		<list:list-view>
+			<list:column qualifier="taskScope"/>
+			<list:column qualifier="site" spring-bean="exportTaskInfoNullListCellRenderer" />
+			<list:column qualifier="catalogVersion" spring-bean="exportTaskInfoNullListCellRenderer"/>
+		</list:list-view>
+	</context>
+
+	<context parent="GenericItem" type="TaskInfo" component="editorareaactions" principal="CBMrole">
+		<y:actions>
+			<y:group qualifier="common">
+				<y:action action-id="com.hybris.cockpitng.action.delete" merge-mode="REMOVE"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context parent="GenericItem" type="TaskInfo" component="listviewactions" merge-by="type" principal="CBMrole">
+		<y:actions>
+			<y:group qualifier="common">
+				<y:action action-id="com.hybris.cockpitng.listview.action.export.csv" merge-mode="REMOVE"/>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.sync" merge-mode="REMOVE"/>
+				<y:action action-id="com.hybris.cockpitng.action.delete" merge-mode="REMOVE"/>
+				<y:action action-id="com.hybris.cockpitng.action.create" merge-mode="REMOVE"/>
+			</y:group>
+			<y:group qualifier="bulk">
+				<y:action id="compare" action-id="com.hybris.cockpitng.action.message" merge-mode="REMOVE"/>
+				<y:action id="bulkEditGeneral" action-id="com.hybris.backoffice.widgets.actions.bulkedit" merge-mode="REMOVE"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<!-- List View END-->
+</config>

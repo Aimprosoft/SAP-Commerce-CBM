@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+--><!--
+ All hybris buildcallbacks.xml macrodefinitions:
+ 
+ Build/Documentation
+ 
+	 before/after ant macro "clean"
+		 <macrodef name="importexportcloud_before_clean"/>
+		 <macrodef name="importexportcloud_after_clean"/>
+	 
+	 before/after ant macro "build"
+		 <macrodef name="importexportcloud_before_build"/>
+		 <macrodef name="importexportcloud_after_build"/>
+		 
+	 before/after ant macro "compile_core" - the core module of the extension
+		 <macrodef name="importexportcloud_before_compile_core">
+		 <macrodef name="importexportcloud_after_compile_core">
+	 
+	 before/after ant macro "compile_web" - the web module of the extension
+		 <macrodef name="importexportcloud_before_compile_web" />
+		 <macrodef name="importexportcloud_after_compile_web" />
+	 
+	 before/after ant macro "compile_hmc" - the hmc module of the extension
+		 <macrodef name="importexportcloud_before_compile_hmc" />
+		 <macrodef name="importexportcloud_after_compile_hmc" />
+ 
+ Preparing extension
+ 
+	 will be called in the beginning of the ant call and only once (also when using multiple 
+	 ant targets e.g. ant build yunittest)	
+		 <macrodef name="importexportcloud_only_once_prepare"/>
+ 
+ Creating ear module/production
+ 
+	 before/after ant macro "ear"
+		 <macrodef name="importexportcloud_before_ear"/>
+		 <macrodef name="importexportcloud_after_ear"/>
+
+	 before/after ant macro "production" - for hybris server only
+		 <macrodef name="importexportcloud_before_production" />
+		 <macrodef name="importexportcloud_after_production" />
+ 
+ JUnit Test
+ 
+	 before/after ant macro "yunitinit" 
+		 <macrodef name="importexportcloud_before_yunitinit" />
+		 <macrodef name="importexportcloud_after_yunitinit" />
+	 
+	 before/after ant macro "yunit"
+		 <macrodef name="importexportcloud_before_yunit" />
+		 <macrodef name="importexportcloud_after_yunit" /> 
+		 
+ Distribution package
+ 
+ 	 before/after ant macro "dist" - internal target; only for use when platform is available in source code
+		 <macrodef name="importexportcloud_after_dist"/>
+		 <macrodef name="importexportcloud_before_dist"/>
+	 
+	 before/after ant macro "dist_copy" - internal target; only for use when platform is available in source code
+		 <macrodef name="importexportcloud_before_dist_copy"/>
+		 <macrodef name="importexportcloud_after_dist_copy"/>
+		  
+ 	 With these filters you can override the default extension filters defined in platform/resources/ant/dist/filtersets.xml
+ 	  	 <patternset id="extension.importexportcloud.binary.filter">
+ 	  	  	 <patternset refid="extension.filter" />
+ 	  	  	 <exclude name="**/*-source.jar" />
+ 	  	 </patternset>
+ 	  	 <patternset id="extension.importexportcloud.source.filter">
+ 	  	  	 <exclude name="**/bin/**" />
+ 	  	 </patternset>
+     With this filter you can decide what should be excluded from development zip.
+ 	  	 <patternset id="extension.importexportcloud.devzip.filter">
+ 	  	 Include all files from extension.source.filter.
+ 	  	     <patternset refid="extension.source.filter" />
+         Exclude unwanted files.
+ 	  	  	 <exclude name="lib/exclude-me.jar" />
+ 	  	 </patternset>
+ 
+-->
+<project name="importexportcloud_buildcallbacks" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+    <loadenv/>
+    <property name="extension.dir" value="${ext.importexportcloud.path}"/>
+    <property name="jarName" value="aws-bundle-shade-2.5.1.jar"/>
+    <property name="pathToJar" value="${extension.dir}/lib/${jarName}"/>
+    <!-- Set properties to blank if not set externally to avoid errors in Maven calls -->
+    <property name="env.MAVEN_OPTS" value=""/>
+    <property name="env.JAVA_OPTS" value=""/>
+    <macrodef name="importexportcloud_after_clean">
+        <sequential>
+            <echo message="***Creating AWS S3 bundle***"/>
+            <run-mvn-plugin/>
+            <echo message="***Finished AWS S3 bundle generation***"/>
+        </sequential>
+    </macrodef>
+    <macrodef name="run-mvn-plugin">
+        <sequential>
+            <artifact:mvn pom="${extension.dir}/external-dependencies-aws.xml"
+                          fork="false" failonerror="true" mavenVersion="3.2.5">
+                <arg value="package"/>
+                <jvmarg line="${env.MAVEN_OPTS} ${env.JAVA_OPTS}"/>
+            </artifact:mvn>
+            <remove-original-jar/>
+        </sequential>
+    </macrodef>
+    <macrodef name="remove-original-jar">
+        <sequential>
+            <if>
+                <and>
+                    <available file="${pathToJar}" />
+                    <available file="${extension.dir}/lib/original-${jarName}" />
+                </and>
+                <then>
+                    <delete file="${extension.dir}/lib/original-${jarName}"/>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+</project>

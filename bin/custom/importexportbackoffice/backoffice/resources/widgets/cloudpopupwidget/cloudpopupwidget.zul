@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<widget xmlns="http://www.zkoss.org/2005/zul" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.hybris.com/schema/cockpitng/zul/zul.xsd"
+        sclass="iem-widget-configuration"
+        id="cloudpopupwidget" height="100%" width="100%">
+
+    <hlayout width="100%" height="90%" sclass="iem-widget-cloudobject-list">
+        <listbox vflex="1" hflex="1" id="objectList" model="${objectListModel}"  emptyMessage="${labels.emptylist}"
+                 forEach="objectList">
+            <listhead sizable="true">
+                <listheader label="${labels.widget.popup.object.name}"/>
+                <listheader label="${labels.widget.popup.object.modification.date}"/>
+            </listhead>
+            <template name="model">
+                <listitem>
+                    <listcell if="${each.folder}" iconSclass="z-icon-folder-open">
+                        <label sclass="ye-processes-settings-container-range-list-label" value="${each.title}"/>
+                    </listcell>
+                    <listcell if="${each.folder}">
+                        <label sclass="ye-processes-settings-container-range-list-label" value=""/>
+                    </listcell>
+                    <listcell if="${!each.folder}" iconSclass="z-icon-file-o">
+                        <label sclass="ye-processes-settings-container-range-list-label" value="${each.title}" />
+                    </listcell>
+                    <listcell if="${!each.folder}">
+                        <label sclass="ye-processes-settings-container-range-list-label" value="${each.modifiedDate}" />
+                    </listcell>
+                </listitem>
+            </template>
+        </listbox>
+    </hlayout>
+    <div sclass="yw-common-popup-navigation yw-dashboard">
+        <div sclass="yw-left-pack">
+            <div sclass="yw-component-wrapper">
+            <button id="backButton"
+                    label="${labels.widget.button.back}"
+                    sclass="yw-btn-primary" disabled="true" style="width: 95px;"/>
+            </div>
+        </div>
+        <div sclass="yw-right-pack">
+            <div sclass="yw-component-wrapper">
+                <button id="discard"
+                        label="${labels.widget.button.cancel}"/>
+            </div>
+            <div sclass="yw-component-wrapper">
+                <button id="chooseObjectButton"
+                        label="${labels.widget.button.choose}"
+                        disabled="true"
+                        sclass="yw-btn-primary"/>
+            </div>
+        </div>
+    </div>
+
+</widget>

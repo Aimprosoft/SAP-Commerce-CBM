@@ -1,0 +1,7 @@
+$lang=en
+
+UPDATE BackofficeRole;uid[unique=true];locname[lang=$lang]
+;CBMrole;"CBM Role"
+
+UPDATE UserGroup;uid[unique=true];locname[lang=$lang]
+;CBMgroup;"CBM Group"

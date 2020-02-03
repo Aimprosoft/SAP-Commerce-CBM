@@ -1,0 +1,27 @@
+INSERT_UPDATE BackofficeRole;UID[unique=true];backOfficeLoginDisabled;authorities
+;CBMrole;FALSE;CBMrole
+
+INSERT_UPDATE UserGroup;UID[unique=true];description
+;CBMgroup;The CBM User Group has access only to CBM Module
+
+INSERT_UPDATE PrincipalGroupRelation;source(uid)[unique=true];target(uid)[unique=true]
+;CBMrole;employeegroup
+;CBMgroup;CBMrole
+
+INSERT_UPDATE SearchRestriction;code[unique = true];name[lang=en];query;principal(UID);restrictedType(code);active;generate
+;taskInfoUser;Filter task by user;{item.user} IN (?session.user);CBMgroup;TaskInfo;true;true
+
+$START_USERRIGHTS;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+BackofficeRole;CBMgroup;;;;;;;;
+
+;;;;LocalStorageConfig;+;+;+;+;-;
+;;;;DropBoxStorageConfig;+;+;+;+;-;
+;;;;AWSs3StorageConfig;+;+;+;+;-;
+;;;;TaskInfo;+;+;+;+;-;
+;;;;CMSSite;+;+;+;+;-;
+;;;;Job;+;+;;;;
+;;;;CronJob;+;-;-;-;-;
+;;;;JobLog;+;+;+;+;;
+;;;;Media;+;;;;;
+$END_USERRIGHTS;;;;;

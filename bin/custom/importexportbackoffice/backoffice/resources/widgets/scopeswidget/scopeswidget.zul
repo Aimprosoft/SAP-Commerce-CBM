@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<widget id="storageConfigWidget" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://www.zkoss.org/2005/zul">
+
+    <panel sclass="z-top-header">
+        <panelchildren>
+            <!--todo add css-->
+            <label style="background-color:#eaedf1; font-family:'Open Sans',Arial,Sans-serif; color:rgb(4, 50, 99)
+; font-size:16px; font-style:normal; font-weight:600; text-align:left; text-overflow:ellipsis;text-size-adjust:100% " value="${labels.task.view.startexport}"/>
+        </panelchildren>
+    </panel>
+
+    <vlayout id="mainLayout" spacing="20px" width="100%" sclass="iem-main-layout">
+        <hlayout>
+            <radiogroup id="scopeConfigRadiogroup" orient="horizontal">
+                <hlayout spacing="20px">
+                    <label value="${labels.label.scope.title} : " sclass="scope-config-widget-label"/>
+                    <radio id="sitesRadio" checked="true"
+                           label="${labels.scope.sites.radio}"
+                           sclass="scope-config-widget-label"
+                           value="SiteScope"/>
+
+                    <radio id="cvRadio"
+                           label="${labels.scope.cv.radio}"
+                           sclass="scope-config-widget-label"
+                           value="CatalogScope"/>
+
+                    <radio id="itemsRadio"
+                           visible="false"
+                           label="${labels.scope.cv.radio}"
+                           sclass="scope-config-widget-label"
+                           value="ItemScope"/>
+                </hlayout>
+            </radiogroup>
+            <checkbox id="exportMediaNeededCheckBox" label="${labels.task.export.include.media}"
+                      sclass="primary-widget-label"
+                      forward="onClick=exportMediaNeededCheckBox.onSelectedExportMediaNeeded()"
+                      checked="true"
+            />
+        </hlayout>
+    </vlayout>
+</widget>

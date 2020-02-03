@@ -1,0 +1,22 @@
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widgets.xsd">
+
+	<widget-extension widgetId="iemViewSwitcher">
+		<widget id="iemImportBorderLayoutView" widgetDefinitionId="com.hybris.cockpitng.borderlayout"
+		        slotId="views" title="import.view">
+					<widget id="importPathWidget"
+					        widgetDefinitionId="com.aimprosoft.importexportbackoffice.widgets.importpathwidget"
+					        slotId="centerSlot"/>
+			<setting key="westDisabled" type="Boolean" value="true"/>
+			<setting key="eastDisabled" type="Boolean" value="true"/>
+		</widget>
+	</widget-extension>
+
+	<widget-connection sourceWidgetId="importPathWidget" outputId="outputImportConfigData"
+	                   targetWidgetId="cloudpopupwidget" inputId="inputImportConfig"/>
+
+	<widget-connection sourceWidgetId="importPathWidget" outputId="outputSearchData"
+	                   targetWidgetId="historyAdvancedSearchEngine" inputId="searchData"/>
+
+</widgets>
+

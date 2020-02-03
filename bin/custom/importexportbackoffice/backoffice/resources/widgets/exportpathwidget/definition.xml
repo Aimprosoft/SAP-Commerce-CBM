@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget-definition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widget-definition.xsd"
+                   id="com.aimprosoft.importexportbackoffice.widgets.exportpathwidget" extends="com.aimprosoft.importexportbackoffice.widgets.importpathwidget">
+    <name>Export Path Widget</name>
+    <description>Widget for choosing path and starting export</description>
+    <defaultTitle>Export Path Widget</defaultTitle>
+    <author>aimprosoft</author>
+    <version>0.1</version>
+
+    <sockets>
+        <input id="selectedScope" type="java.lang.String"/>
+        <input id="inputCatalog" type="java.lang.String"/>
+        <input id="inputSite" type="java.lang.String"/>
+        <input id="selectedExportMediaNeeded" type="java.lang.Boolean"/>
+        <input id="inputSite" type="java.lang.String"/>
+        <input id="inputChoosenObject" type="java.util.Map"/>
+        <input id="selectedView" type="java.lang.String"/>
+        <input id="inputStorageTypeData" type="com.aimprosoft.importexportcloud.facades.data.StorageTypeData"/>
+        <output id="outputExportConfigData" type="com.aimprosoft.importexportcloud.facades.data.StorageConfigData"/>
+        <output id="outputStorageConfigData" type="com.aimprosoft.importexportcloud.facades.data.StorageConfigData"/>
+        <output id="outputSearchData" type="com.hybris.backoffice.widgets.advancedsearch.impl.AdvancedSearchData"/>
+        <output id="reset" type="com.aimprosoft.importexportcloud.facades.data.StorageConfigData"/>
+    </sockets>
+
+    <controller class="com.aimprosoft.importexportbackoffice.widgets.exportpathwidget.ExportPathWidgetController"/>
+
+</widget-definition>

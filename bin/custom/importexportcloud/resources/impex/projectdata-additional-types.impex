@@ -1,0 +1,3 @@
+#put your nesessary additional composed type codes here
+INSERT_UPDATE IemExportConfiguration;code[unique=true];description;classificationTypeCodes;productTypeCodes;contentTypeCodes;siteTypeCodes
+;defaultIemExportConfiguration;Default configutation for exporting;;;;;

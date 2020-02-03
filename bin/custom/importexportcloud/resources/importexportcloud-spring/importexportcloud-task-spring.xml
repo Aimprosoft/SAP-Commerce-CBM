@@ -1,0 +1,73 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<alias name="defaultTaskInfoPaginatedDao" alias="taskInfoPaginatedDao"/>
+	<bean id="defaultTaskInfoPaginatedDao" class="com.aimprosoft.importexportcloud.dao.impl.DefaultTaskInfoPaginatedDao">
+		<constructor-arg value="TaskInfo"/>
+		<property name="paginatedFlexibleSearchService" ref="paginatedFlexibleSearchService"/>
+	</bean>
+
+	<alias name="defaultTaskInfoService" alias="taskInfoService"/>
+	<bean name="defaultTaskInfoService"
+	      class="com.aimprosoft.importexportcloud.service.impl.DefaultTaskInfoService" parent="abstractBusinessService">
+		<property name="taskInfoPaginatedDao" ref="taskInfoPaginatedDao"/>
+		<property name="keyGenerator" ref="taskInfoCodeGenerator"/>
+		<property name="exportTaskInfoReverseConverter" ref="exportTaskInfoReverseConverter"/>
+		<property name="importTaskInfoReverseConverter" ref="importTaskInfoReverseConverter"/>
+	</bean>
+
+	<!-- task-->
+	<bean id="taskInfoCodeGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator">
+		<property name="key" value="${keygen.taskinfo.code.name}"/>
+		<property name="digits" value="${keygen.taskinfo.code.digits}"/>
+		<property name="start" value="${keygen.taskinfo.code.start}"/>
+		<property name="type" value="${keygen.taskinfo.code.type}"/>
+		<property name="template" value="${keygen.taskinfo.code.template}"/>
+	</bean>
+
+	<alias name="defaultTaskInfoReversePopulator" alias="taskInfoReversePopulator"/>
+	<bean id="defaultTaskInfoReversePopulator"
+	      class="com.aimprosoft.importexportcloud.converters.populators.TaskInfoReversePopulator">
+		<property name="storageConfigService" ref="storageConfigService"/>
+		<property name="userService" ref="userService"/>
+		<property name="keyGenerator" ref="taskInfoCodeGenerator"/>
+	</bean>
+
+	<alias name="defaultImportTaskInfoReversePopulator" alias="importTaskInfoReversePopulator"/>
+	<bean id="defaultImportTaskInfoReversePopulator"
+	      class="com.aimprosoft.importexportcloud.converters.populators.ImportTaskInfoReversePopulator">
+	</bean>
+
+	<alias name="defaultExportTaskInfoReversePopulator" alias="exportTaskInfoReversePopulator"/>
+	<bean id="defaultExportTaskInfoReversePopulator"
+	      class="com.aimprosoft.importexportcloud.converters.populators.ExportTaskInfoReversePopulator">
+		<property name="iemCmsSiteService" ref="iemCmsSiteService"/>
+		<property name="iemCatalogVersionService" ref="iemCatalogVersionService"/>
+		<property name="enumerationService" ref="enumerationService"/>
+	</bean>
+
+	<alias name="defaultImportTaskInfoReverseConverter" alias="importTaskInfoReverseConverter"/>
+	<bean id="defaultImportTaskInfoReverseConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="com.aimprosoft.importexportcloud.model.ImportTaskInfoModel"/>
+		<property name="populators">
+			<list>
+				<ref bean="taskInfoReversePopulator"/>
+				<ref bean="importTaskInfoReversePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultExportTaskInfoReverseConverter" alias="exportTaskInfoReverseConverter"/>
+	<bean id="defaultExportTaskInfoReverseConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="com.aimprosoft.importexportcloud.model.ExportTaskInfoModel"/>
+		<property name="populators">
+			<list>
+				<ref bean="taskInfoReversePopulator"/>
+				<ref bean="exportTaskInfoReversePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+</beans>

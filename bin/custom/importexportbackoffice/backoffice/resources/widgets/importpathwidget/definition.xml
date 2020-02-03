@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget-definition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widget-definition.xsd"
+                   id="com.aimprosoft.importexportbackoffice.widgets.importpathwidget">
+    <name>Import Path Widget</name>
+    <description>Widget for choosing path and starting import</description>
+    <defaultTitle>Import Path Widget</defaultTitle>
+    <author>aimprosoft</author>
+    <version>0.1</version>
+
+    <sockets>
+        <input id="inputStorageConfigData" type="com.aimprosoft.importexportcloud.facades.data.StorageConfigData"/>
+        <input id="reset" type="com.aimprosoft.importexportcloud.facades.data.StorageConfigData"/>
+        <input id="inputChoosenObject" type="java.util.Map"/>
+        <input id="selectedView" type="java.lang.String"/>
+        <input id="inputStorageTypeData" type="com.aimprosoft.importexportcloud.facades.data.StorageTypeData"/>
+        <output id="outputStorageConfigData" type="com.aimprosoft.importexportcloud.facades.data.StorageConfigData"/>
+        <output id="outputImportConfigData" type="com.aimprosoft.importexportcloud.facades.data.StorageConfigData"/>
+        <output id="outputSearchData" type="com.hybris.backoffice.widgets.advancedsearch.impl.AdvancedSearchData"/>
+    </sockets>
+
+    <controller class="com.aimprosoft.importexportbackoffice.widgets.importpathwidget.ImportPathWidgetController"/>
+
+    <settings>
+        <setting key="isExport" type="Boolean" default-value="false"/>
+    </settings>
+
+    <keywords>
+        <keyword>Import Export Module</keyword>
+    </keywords>
+</widget-definition>

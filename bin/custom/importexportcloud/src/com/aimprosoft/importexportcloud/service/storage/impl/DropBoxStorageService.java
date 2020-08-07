@@ -1,10 +1,21 @@
 package com.aimprosoft.importexportcloud.service.storage.impl;
 
-import static com.aimprosoft.importexportcloud.constants.ImportexportcloudConstants.IEM_TRANSMIT_FILE_EXTENSION;
-import static com.aimprosoft.importexportcloud.constants.ImportexportcloudConstants.STORAGE_PATH_SEPARATOR;
-
+import com.aimprosoft.importexportcloud.exceptions.CloudStorageException;
+import com.aimprosoft.importexportcloud.facades.data.CloudObjectData;
+import com.aimprosoft.importexportcloud.facades.data.StorageConfigData;
+import com.aimprosoft.importexportcloud.facades.data.TaskInfoData;
+import com.aimprosoft.importexportcloud.providers.DropboxConnectionProvider;
+import com.aimprosoft.importexportcloud.service.storage.DropBoxBatchUploadStrategy;
+import com.dropbox.core.DbxDownloader;
+import com.dropbox.core.DbxException;
+import com.dropbox.core.v2.DbxClientV2;
+import com.dropbox.core.v2.files.*;
 import de.hybris.platform.servicelayer.dto.converter.Converter;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Required;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,23 +24,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Required;
-
-import com.aimprosoft.importexportcloud.exceptions.CloudStorageException;
-import com.aimprosoft.importexportcloud.facades.data.CloudObjectData;
-import com.aimprosoft.importexportcloud.facades.data.StorageConfigData;
-import com.aimprosoft.importexportcloud.facades.data.TaskInfoData;
-import com.aimprosoft.importexportcloud.providers.DropboxConnectionProvider;
-import com.dropbox.core.DbxDownloader;
-import com.dropbox.core.DbxException;
-import com.dropbox.core.v2.DbxClientV2;
-import com.dropbox.core.v2.files.FileMetadata;
-import com.dropbox.core.v2.files.FolderMetadata;
-import com.dropbox.core.v2.files.ListFolderResult;
-import com.dropbox.core.v2.files.Metadata;
-import com.dropbox.core.v2.files.WriteMode;
+import static com.aimprosoft.importexportcloud.constants.ImportexportcloudConstants.IEM_TRANSMIT_FILE_EXTENSION;
+import static com.aimprosoft.importexportcloud.constants.ImportexportcloudConstants.STORAGE_PATH_SEPARATOR;
+import static com.aimprosoft.importexportcloud.service.storage.impl.DefaultDropBoxBatchUploadStrategy.CHUNKED_UPLOAD_CHUNK_SIZE;
 
 
 public class DropBoxStorageService extends AbstractStorageService
@@ -46,6 +43,8 @@ public class DropBoxStorageService extends AbstractStorageService
 
 	private DropboxConnectionProvider dropboxConnectionProvider;
 
+	private DropBoxBatchUploadStrategy dropBoxBatchUploadStrategy;
+
 	@Override
 	public TaskInfoData download(final TaskInfoData taskInfoData) throws CloudStorageException
 	{
@@ -53,13 +52,11 @@ public class DropBoxStorageService extends AbstractStorageService
 		final DbxClientV2 client = getClient(taskInfoData.getConfig());
 		final String dropBoxFilePath = resolveDropBoxPath(filePath);
 
-		try
+		try (final DbxDownloader<FileMetadata> download = client.files().download(dropBoxFilePath))
 		{
-			final DbxDownloader<FileMetadata> download = client.files().download(dropBoxFilePath);
+			LOGGER.debug("Downloading from dropBox. Path: " + taskInfoData.getCloudFileDownloadPathToDisplay());
 
-			LOGGER.info("Downloading from dropBox. Path: " + taskInfoData.getCloudFileDownloadPathToDisplay());
 			taskInfoData.setDownloadedFilePath(getDownloadedFilePath(download.getInputStream()));
-
 		}
 		catch (final DbxException e)
 		{
@@ -75,16 +72,27 @@ public class DropBoxStorageService extends AbstractStorageService
 		final String cloudFileUploadPath = taskInfoData.getCloudUploadFolderPath();
 		final Path fileToUploadPath = taskInfoData.getFileToUploadPath();
 		final DbxClientV2 client = getClient(taskInfoData.getConfig());
-		final String dropBoxFilePath = resolveDropBoxPath(cloudFileUploadPath) + STORAGE_PATH_SEPARATOR + taskInfoData.getRealFileName();
+		final String dropBoxFilePath =
+				resolveDropBoxPath(cloudFileUploadPath) + STORAGE_PATH_SEPARATOR + taskInfoData.getRealFileName();
 		logUploadingFile(LOGGER, taskInfoData);
 
-		LOGGER.info("Starting uploading file to Dropbox...");
+		LOGGER.info("Uploading file to Dropbox has been started...");
+
+		File file = fileToUploadPath.toFile();
+		long length = file.length();
 
 		try (final InputStream inputStream = new FileInputStream(fileToUploadPath.toFile()))
 		{
-			client.files().uploadBuilder(dropBoxFilePath)
-					.withMode(WriteMode.ADD)
-					.uploadAndFinish(inputStream);
+
+			if (length > CHUNKED_UPLOAD_CHUNK_SIZE)
+			{
+				dropBoxBatchUploadStrategy.uploadBatch(client, dropBoxFilePath, fileToUploadPath.toFile());
+			}
+			else {
+				client.files().uploadBuilder(dropBoxFilePath)
+						.withMode(WriteMode.ADD)
+						.uploadAndFinish(inputStream);
+			}
 
 			LOGGER.info("Uploading was successful.");
 		}
@@ -108,6 +116,56 @@ public class DropBoxStorageService extends AbstractStorageService
 		return getCloudObjectDataList(metadataList, taskInfoData.getIsExport());
 	}
 
+	@Override
+	public long getSize(final StorageConfigData storageConfig, final String location) throws CloudStorageException
+	{
+		final DbxClientV2 client = getClient(storageConfig);
+		final String dropBoxFilePath = getDropboxConnectionProvider().getEnsuredPath(location);
+		try
+		{
+			final Metadata metadata = client.files().getMetadata(dropBoxFilePath);
+			return metadata instanceof FileMetadata
+					? ((FileMetadata) metadata).getSize()
+					: 0L;
+		}
+		catch (DbxException e)
+		{
+			throw new CloudStorageException("An error occurred during getting Size from DropBox", e);
+		}
+	}
+
+	@Override
+	public InputStream getAsStream(final StorageConfigData storageConfig, final String location) throws CloudStorageException
+	{
+		final DbxClientV2 client = getClient(storageConfig);
+		final String dropBoxFilePath = getDropboxConnectionProvider().getEnsuredPath(location);
+		try (final DbxDownloader<FileMetadata> download = client.files().download(dropBoxFilePath))
+		{
+			return download.getInputStream();
+		}
+		catch (DbxException e)
+		{
+			throw new CloudStorageException("An error occurred during getting Stream from DropBox", e);
+		}
+	}
+
+	@Override
+	public void delete(final StorageConfigData storageConfig, final String location) throws CloudStorageException
+	{
+		final DbxClientV2 client = getClient(storageConfig);
+		final String dropBoxFilePath = getDropboxConnectionProvider().getEnsuredPath(location);
+		try
+		{
+			client.files().deleteV2(dropBoxFilePath);
+
+			LOGGER.debug("Removed " + location + " from " + storageConfig.getCode());
+		}
+		catch (DbxException e)
+		{
+			throw new CloudStorageException("An error occurred during removing from DropBox", e);
+		}
+	}
+
 	private List<Metadata> getMetadata(final TaskInfoData taskInfoData) throws CloudStorageException
 	{
 		final DbxClientV2 client = getClient(taskInfoData.getConfig());
@@ -123,7 +181,7 @@ public class DropBoxStorageService extends AbstractStorageService
 				result.addAll(listFolderResult.getEntries());
 				final String cursor = listFolderResult.getCursor();
 				listFolderResult = client.files().listFolderContinue(cursor);
-				LOGGER.info("Get dropBox list folder: " + cloudFolderPath);
+				LOGGER.debug("Get dropBox list folder: " + cloudFolderPath);
 			}
 			while (listFolderResult.getHasMore());
 		}
@@ -229,5 +287,18 @@ public class DropBoxStorageService extends AbstractStorageService
 	{
 		this.dropboxConnectionProvider = dropboxConnectionProvider;
 	}
+
+	public DropBoxBatchUploadStrategy getDropBoxBatchUploadStrategy()
+	{
+		return dropBoxBatchUploadStrategy;
+	}
+
+	@Required
+	public void setDropBoxBatchUploadStrategy(
+			DropBoxBatchUploadStrategy dropBoxBatchUploadStrategy)
+	{
+		this.dropBoxBatchUploadStrategy = dropBoxBatchUploadStrategy;
+	}
 }
+
 

@@ -55,7 +55,7 @@
 	                   targetWidgetId="cloudpopupwidget" inputId="inputExportConfig"/>
 
 	<widget-connection sourceWidgetId="exportPathWidget" outputId="outputSearchData"
-	                   targetWidgetId="historyAdvancedSearchEngine" inputId="searchData"/>
+	                   targetWidgetId="iemAdvancedSearchEngine" inputId="searchData"/>
 
 	<widget-connection sourceWidgetId="exportPathWidget" outputId="reset"
 	                   targetWidgetId="sourceselectorwidget" inputId="reset"/>

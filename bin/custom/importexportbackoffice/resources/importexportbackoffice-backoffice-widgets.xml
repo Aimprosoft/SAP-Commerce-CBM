@@ -11,7 +11,10 @@
     <!-- Widgets configurations and views for export view -->
     <import resource="importexport-backoffice-widgets/importexportbackoffice-widgets-export.xml"/>
 
+    <!-- Widgets configurations and views for migration tree nodes-->
+    <import resource="importexport-backoffice-widgets/importexportbackoffice-widgets-migration.xml"/>
+
     <!-- Widgets configurations and views for history tree nodes, import and export views -->
-    <import resource="importexport-backoffice-widgets/importexportbackoffice-widgets-history.xml"/>
+    <import resource="importexport-backoffice-widgets/importexportbackoffice-widgets-additional.xml"/>
 
 </widgets>

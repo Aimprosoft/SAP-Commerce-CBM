@@ -20,8 +20,15 @@ BackofficeRole;CBMgroup;;;;;;;;
 ;;;;AWSs3StorageConfig;+;+;+;+;-;
 ;;;;TaskInfo;+;+;+;+;-;
 ;;;;CMSSite;+;+;+;+;-;
-;;;;Job;+;+;;;;
-;;;;CronJob;+;-;-;-;-;
+;;;;CMSVersion;+;+;+;+;-;
+;;;;Job;+;-;;;;
+;;;;CronJob;+;-;+;-;-;
 ;;;;JobLog;+;+;+;+;;
 ;;;;Media;+;;;;;
+;;;;SolrFacetSearchConfig;+;-;-;;;
+;;;;CatalogVersion;+;;;;;
+;;;;CronJobHistory;+;;;;;
 $END_USERRIGHTS;;;;;
+
+INSERT_UPDATE SearchRestriction; code[unique = true];name[lang = en];query;
+                               ; HideSystemPrincipals;HideSystemPrincipals;({item.uid} not in ( 'anonymous', 'admin', 'admingroup' ) and exists ({{select {u.pk} from {User as u} where {u.uid} != 'iemuser' and {u.pk} = ?session.user }})) OR ({item.uid} not in (  'admin', 'admingroup' ) and exists ({{select {u.pk} from {User as u} where {u.uid} = 'iemuser' and {u.pk} = ?session.user }}));

@@ -47,7 +47,7 @@ public class DefaultAWSs3StorageConfigReverseConverterIntegrationTest extends Se
 		aWSs3StorageConfigData = new StorageConfigData();
 		aWSs3StorageConfigData.setCode(aWSs3StorageConfigCode);
 		aWSs3StorageConfigData.setName(aWSs3StorageConfigName);
-		StorageTypeData aWSStorageTypeData = new StorageTypeData();
+		final StorageTypeData aWSStorageTypeData = new StorageTypeData();
 		aWSStorageTypeData.setCode(aWSs3StorageTypeCode);
 		aWSs3StorageConfigData.setStorageTypeData(aWSStorageTypeData);
 		aWSs3StorageConfigData.setAppKey(aWSs3StorageConfigAppKey);
@@ -59,7 +59,7 @@ public class DefaultAWSs3StorageConfigReverseConverterIntegrationTest extends Se
 	@Test
 	public void testConvert()
 	{
-		AWSs3StorageConfigModel storageConfigModel = converter.convert(aWSs3StorageConfigData);
+		final AWSs3StorageConfigModel storageConfigModel = converter.convert(aWSs3StorageConfigData);
 
 		assertEquals(aWSs3StorageConfigName, storageConfigModel.getName());
 		assertEquals(storageTypeModel, storageConfigModel.getType());

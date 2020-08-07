@@ -11,27 +11,46 @@ import de.hybris.platform.cronjob.model.CronJobModel;
 import de.hybris.platform.servicelayer.dto.converter.Converter;
 import de.hybris.platform.servicelayer.internal.service.AbstractBusinessService;
 import de.hybris.platform.servicelayer.keygenerator.KeyGenerator;
+import de.hybris.platform.servicelayer.session.SessionExecutionBody;
+import de.hybris.platform.servicelayer.user.UserService;
+import de.hybris.platform.util.MediaUtil;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
 
 import com.aimprosoft.importexportcloud.dao.TaskInfoPaginatedDao;
 import com.aimprosoft.importexportcloud.enums.TaskInfoStatus;
+import com.aimprosoft.importexportcloud.exceptions.TaskException;
 import com.aimprosoft.importexportcloud.facades.data.TaskInfoData;
 import com.aimprosoft.importexportcloud.model.ExportTaskInfoModel;
 import com.aimprosoft.importexportcloud.model.ImportTaskInfoModel;
 import com.aimprosoft.importexportcloud.model.StorageTypeModel;
 import com.aimprosoft.importexportcloud.model.TaskInfoModel;
 import com.aimprosoft.importexportcloud.service.TaskInfoService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class DefaultTaskInfoService extends AbstractBusinessService implements TaskInfoService<TaskInfoModel>
 {
+	private static final Logger LOGGER = Logger.getLogger(DefaultTaskInfoService.class);
+	private static final String SERVICE_FILE = "service_file.json";
+
 	private static final int DEFAULT_PAGE_SIZE = 10;
+	private static final String SEARCH_PAGE_DATA = "searchPageData";
 
 	private TaskInfoPaginatedDao<TaskInfoModel> taskInfoPaginatedDao;
 
@@ -41,24 +60,40 @@ public class DefaultTaskInfoService extends AbstractBusinessService implements T
 
 	private KeyGenerator keyGenerator;
 
+	private UserService userService;
+
 	@Override
 	public SearchPageData<TaskInfoModel> getAllTasks(final SearchPageData<TaskInfoModel> searchPageData)
 	{
-		validateParameterNotNullStandardMessage("searchPageData", searchPageData);
+		validateParameterNotNullStandardMessage(SEARCH_PAGE_DATA, searchPageData);
 		return taskInfoPaginatedDao.find(searchPageData);
+	}
+
+	@Override
+	public SearchPageData<TaskInfoModel> getActiveTasks()
+	{
+		validateParameterNotNullStandardMessage(SEARCH_PAGE_DATA, getSearchPageData());
+		return sessionService.executeInLocalView(new SessionExecutionBody()
+		{
+			@Override
+			public Object execute()
+			{
+				return taskInfoPaginatedDao.findActiveTasks(getSearchPageData());
+			}
+		}, userService.getAdminUser());
 	}
 
 	@Override
 	public TaskInfoModel getTaskByCode(final String code)
 	{
-		validateParameterNotNullStandardMessage(StorageTypeModel.CODE, code);
+		validateParameterNotNullStandardMessage(TaskInfoModel.CODE, code);
 
 		final Map<String, Object> searchParameterMap = new HashMap<>();
 		searchParameterMap.put(StorageTypeModel.CODE, code);
 
 		final List<TaskInfoModel> storageTypeList = taskInfoPaginatedDao.find(searchParameterMap, getSearchPageData()).getResults();
 
-		validateIfSingleResult(storageTypeList, format("StorageType with code '%s' not found!", code),
+		validateIfSingleResult(storageTypeList, format("TaskInfoModel with code '%s' not found!", code),
 				format("StorageType code '%s' is not unique, %d storage types found!", code, storageTypeList.size()));
 
 		return storageTypeList.get(0);
@@ -70,7 +105,7 @@ public class DefaultTaskInfoService extends AbstractBusinessService implements T
 	{
 		validateParameterNotNullStandardMessage(UserModel.UID, userUid);
 		validateParameterNotNullStandardMessage("type", type);
-		validateParameterNotNullStandardMessage("searchPageData", searchPageData);
+		validateParameterNotNullStandardMessage(SEARCH_PAGE_DATA, searchPageData);
 		return taskInfoPaginatedDao.findByUserAndType(userUid, type, searchPageData);
 	}
 
@@ -116,12 +151,43 @@ public class DefaultTaskInfoService extends AbstractBusinessService implements T
 	}
 
 	@Override
-	public void updateTaskInfo(final TaskInfoModel taskInfoModel, final CronJobModel cronJobModel, final TaskInfoStatus taskInfoStatus)
+	public void updateTaskInfo(final TaskInfoModel taskInfoModel, final CronJobModel cronJobModel,
+			final TaskInfoStatus taskInfoStatus)
 	{
 		taskInfoModel.setStatus(taskInfoStatus);
 		taskInfoModel.setFinishedDate(new Date());
 		taskInfoModel.setCronJob(cronJobModel);
 		getModelService().save(taskInfoModel);
+	}
+
+	@Override
+	public TaskInfoData getTaskInfoFromJSON(final Path filePath) throws TaskException
+	{
+		TaskInfoData taskInfoData = null;
+
+		try (final ZipFile zipFile = new ZipFile(filePath.toString()))
+		{
+			final ZipEntry entry = zipFile.getEntry(SERVICE_FILE);
+			if (entry != null)
+			{
+				try (final InputStream stream = zipFile.getInputStream(entry))
+				{
+					final String json = IOUtils.toString(stream, Charset.defaultCharset());
+					final ObjectMapper mapper = new ObjectMapper();
+					taskInfoData = mapper.readValue(json, TaskInfoData.class);
+				}
+			}
+			else
+			{
+				throw new TaskException("Couldn't process service file from zip archive: " + getArchiveName(filePath.toString()));
+			}
+		}
+		catch (final IOException e)
+		{
+			LOGGER.error("Couldn't process service file from zip archive: " + filePath, e);
+		}
+
+		return taskInfoData;
 	}
 
 	private SearchPageData<TaskInfoModel> getSearchPageData()
@@ -132,6 +198,31 @@ public class DefaultTaskInfoService extends AbstractBusinessService implements T
 		paginationData.setPageSize(DEFAULT_PAGE_SIZE);
 		searchPageData.setPagination(paginationData);
 		return searchPageData;
+	}
+
+	@Override
+	public File generateJsonFileWithServiceData(final TaskInfoData taskInfoData)
+	{
+		final Path path = Paths.get(MediaUtil.getLocalStorageDataDir() + File.separator);
+		File file = null;
+		try
+		{
+			file = new File(path + File.separator + SERVICE_FILE);
+			final ObjectMapper mapper = new ObjectMapper();
+			mapper.writeValue(file, taskInfoData);
+
+		}
+		catch (IOException e)
+		{
+			LOGGER.error("Error while getting service file from zip " + path);
+		}
+
+		return file;
+	}
+
+	private String getArchiveName(final String filePath)
+	{
+		return filePath.substring(filePath.lastIndexOf("/") + 1, filePath.indexOf(".") + 4);
 	}
 
 	public TaskInfoPaginatedDao<TaskInfoModel> getTaskInfoPaginatedDao()
@@ -151,7 +242,8 @@ public class DefaultTaskInfoService extends AbstractBusinessService implements T
 	}
 
 	@Required
-	public void setImportTaskInfoReverseConverter(final Converter<TaskInfoData, ImportTaskInfoModel> importTaskInfoReverseConverter)
+	public void setImportTaskInfoReverseConverter(
+			final Converter<TaskInfoData, ImportTaskInfoModel> importTaskInfoReverseConverter)
 	{
 		this.importTaskInfoReverseConverter = importTaskInfoReverseConverter;
 	}
@@ -162,7 +254,8 @@ public class DefaultTaskInfoService extends AbstractBusinessService implements T
 	}
 
 	@Required
-	public void setExportTaskInfoReverseConverter(final Converter<TaskInfoData, ExportTaskInfoModel> exportTaskInfoReverseConverter)
+	public void setExportTaskInfoReverseConverter(
+			final Converter<TaskInfoData, ExportTaskInfoModel> exportTaskInfoReverseConverter)
 	{
 		this.exportTaskInfoReverseConverter = exportTaskInfoReverseConverter;
 	}
@@ -176,5 +269,11 @@ public class DefaultTaskInfoService extends AbstractBusinessService implements T
 	public void setKeyGenerator(final KeyGenerator keyGenerator)
 	{
 		this.keyGenerator = keyGenerator;
+	}
+
+	@Required
+	public void setUserService(final UserService userService)
+	{
+		this.userService = userService;
 	}
 }

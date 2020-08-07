@@ -1,19 +1,30 @@
 package com.aimprosoft.importexportcloud.service.connection.impl;
 
-import javax.servlet.http.HttpSession;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Required;
-
 import com.aimprosoft.importexportcloud.exceptions.CloudStorageException;
 import com.aimprosoft.importexportcloud.facades.data.StorageConfigData;
-import com.aimprosoft.importexportcloud.facades.data.TaskInfoData;
 import com.aimprosoft.importexportcloud.providers.S3ConnectionProvider;
-
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Required;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.auth.signer.AwsS3V4Signer;
+import software.amazon.awssdk.auth.signer.params.Aws4PresignerParams;
+import software.amazon.awssdk.core.Protocol;
 import software.amazon.awssdk.core.exception.SdkException;
+import software.amazon.awssdk.http.SdkHttpFullRequest;
+import software.amazon.awssdk.http.SdkHttpMethod;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3Utilities;
+import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 import software.amazon.awssdk.services.s3.model.ListBucketsResponse;
+
+import javax.servlet.http.HttpSession;
+import java.net.MalformedURLException;
+import java.time.Instant;
 
 
 public class DefaultS3ConnectionService extends AbstractConnectionService
@@ -25,11 +36,12 @@ public class DefaultS3ConnectionService extends AbstractConnectionService
 	@Override
 	public void connect(final StorageConfigData storageConfigData) throws CloudStorageException
 	{
-		final S3Client s3Client = getS3Client(storageConfigData);
+		try (final S3Client s3Client = getS3Client(storageConfigData))
+		{
+			checkConnection(s3Client);
 
-		checkConnection(s3Client);
-
-		getStorageConfigService().setConnectionStatus(storageConfigData.getCode(), Boolean.TRUE);
+			getStorageConfigService().setConnectionStatus(storageConfigData.getCode(), Boolean.TRUE);
+		}
 	}
 
 	/*
@@ -56,9 +68,71 @@ public class DefaultS3ConnectionService extends AbstractConnectionService
 	}
 
 	@Override
-	public String obtainPublicURL(final TaskInfoData taskInfoData)
+	public String obtainPublicURL(final StorageConfigData storageConfig, final String location)
+			throws CloudStorageException
 	{
-		throw new UnsupportedOperationException("");
+		final boolean useSignedUrl = storageConfig.isUseSignedUrls();
+
+		if (BooleanUtils.isFalse(useSignedUrl))
+		{
+			final S3Utilities utilities = getS3Client(storageConfig).utilities();
+
+			final GetUrlRequest getUrlRequest = GetUrlRequest.builder()
+					.bucket(storageConfig.getBucketName())
+					.region(Region.of(storageConfig.getRegion()))
+					.key(location)
+					.build();
+
+			return utilities.getUrl(getUrlRequest).toString();
+		}
+
+		final Aws4PresignerParams presignedParams = buildPresignedRequstParams(storageConfig);
+
+		final SdkHttpFullRequest presignRequest = buildPresignRequest(storageConfig, location);
+
+		final SdkHttpFullRequest presignRequestResult = AwsS3V4Signer.create()
+				.presign(presignRequest, presignedParams);
+
+		try
+		{
+			return presignRequestResult.getUri()
+					.toURL()
+					.toString();
+		}
+		catch (MalformedURLException e)
+		{
+			throw new CloudStorageException("Malformed presign URL: ", e);
+		}
+	}
+
+	private static SdkHttpFullRequest buildPresignRequest(final StorageConfigData storageConfig, final String location)
+	{
+		return SdkHttpFullRequest.builder()
+				.encodedPath("/" + location)
+				.host(storageConfig.getBucketName() + ".s3." + storageConfig.getRegion() + ".amazonaws.com")
+				.method(SdkHttpMethod.GET)
+				.protocol(Protocol.HTTPS.toString())
+				.build();
+	}
+
+	private Aws4PresignerParams buildPresignedRequstParams(final StorageConfigData storageConfig)
+	{
+		final Region region = Region.of(storageConfig.getRegion());
+
+		return Aws4PresignerParams.builder()
+				.expirationTime(Instant.now().plus(getSignedUrlDuration()))
+				.awsCredentials(getConfiguredCredentialProvider(storageConfig).resolveCredentials())
+				.signingName("s3")
+				.signingRegion(region)
+				.build();
+	}
+
+	private static AwsCredentialsProvider getConfiguredCredentialProvider(final StorageConfigData data)
+	{
+		final AwsBasicCredentials basicCredentials = AwsBasicCredentials
+				.create(data.getAppKey(), data.getEncodedAppSecret());
+
+		return StaticCredentialsProvider.create(basicCredentials);
 	}
 
 	protected S3Client getS3Client(final StorageConfigData storageConfigData) throws CloudStorageException

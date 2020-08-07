@@ -18,7 +18,7 @@ import com.aimprosoft.importexportcloud.export.generators.ComposedTypesGenerator
 
 public abstract class AbstractComposedTypesGenerator implements ComposedTypesGenerator
 {
-	protected static final Logger LOGGER = Logger.getLogger(AbstractComposedTypesGenerator.class);
+	private static final Logger LOGGER = Logger.getLogger(AbstractComposedTypesGenerator.class);
 
 	private Collection<ComposedTypesGenerator> generators = Collections.emptyList();
 

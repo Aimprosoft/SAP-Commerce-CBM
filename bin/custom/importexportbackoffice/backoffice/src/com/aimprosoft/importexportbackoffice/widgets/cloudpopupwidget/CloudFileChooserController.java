@@ -25,7 +25,6 @@ import com.aimprosoft.importexportcloud.facades.data.CloudObjectData;
 import com.aimprosoft.importexportcloud.facades.data.StorageConfigData;
 import com.aimprosoft.importexportcloud.facades.data.TaskInfoData;
 import com.dropbox.core.DbxException;
-import com.hybris.backoffice.widgets.notificationarea.NotificationService;
 import com.hybris.cockpitng.annotations.SocketEvent;
 import com.hybris.cockpitng.annotations.ViewEvent;
 import com.hybris.cockpitng.util.DefaultWidgetController;
@@ -37,8 +36,6 @@ public class CloudFileChooserController extends DefaultWidgetController //NOSONA
 
 	@WireVariable
 	private transient CloudStorageFacade cloudStorageFacade;
-	@WireVariable
-	private transient NotificationService notificationService;
 
 	@Wire
 	private Listbox objectList;
@@ -90,16 +87,16 @@ public class CloudFileChooserController extends DefaultWidgetController //NOSONA
 	@ViewEvent(componentID = "chooseObjectButton", eventName = "onClick")
 	public void onChooseObject()
 	{
-		if (objectList.getSelectedItem() != null)
+		if (objectList.getSelectedItem() == null)
+		{
+			resolveChooseButtonDisabling(new CloudObjectData());
+		}
+		else
 		{
 			final CloudObjectData selectedItem = objectList.getSelectedItem().getValue();
 			final String socketName = isExport ? "chosenExportObject" : "chosenImportObject";
 			logSelectedPath(selectedItem, socketName);
 			sendOutputData(selectedItem, socketName);
-		}
-		else
-		{
-			resolveChooseButtonDisabling(new CloudObjectData());
 		}
 	}
 

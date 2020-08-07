@@ -18,10 +18,10 @@ import java.nio.file.Paths;
 import static org.junit.Assert.assertNotNull;
 
 
-public class DefaultImportFacadeIntegrationTest extends ServicelayerTransactionalTest
+public class DefaultIemImportFacadeIntegrationTest extends ServicelayerTransactionalTest
 {
 	@Resource
-	private DefaultImportFacade defaultImportFacade;
+	private DefaultIemImportFacade defaultIemImportFacade;
 
 	@Resource
 	private DefaultCloudStorageFacade defaultCloudStorageFacade;
@@ -58,7 +58,7 @@ public class DefaultImportFacadeIntegrationTest extends ServicelayerTransactiona
 		Path downloadedFilePath = Paths.get(getClass().getResource("/test/mock.zip").getPath());
 		taskInfoData.setDownloadedFilePath(downloadedFilePath);
 
-		assertNotNull(defaultImportFacade.importData(taskInfoData));
+		assertNotNull(defaultIemImportFacade.importData(taskInfoData));
 	}
 
 	@Test(expected = IemException.class)
@@ -67,7 +67,7 @@ public class DefaultImportFacadeIntegrationTest extends ServicelayerTransactiona
 		TaskInfoData taskInfoData = initDTO(DROPBOX_TEST_STORAGE_CONFIG_CODE);
 		taskInfoData.setCloudFileDownloadPath("/test.text");
 		assertNotNull(defaultCloudStorageFacade.download(taskInfoData));
-		assertNotNull(defaultImportFacade.importData(taskInfoData));
+		assertNotNull(defaultIemImportFacade.importData(taskInfoData));
 	}
 
 	@Test(expected = IemException.class)
@@ -76,7 +76,7 @@ public class DefaultImportFacadeIntegrationTest extends ServicelayerTransactiona
 		TaskInfoData taskInfoData = initDTO(DROPBOX_TEST_STORAGE_CONFIG_CODE);
 		taskInfoData.setCloudFileDownloadPath("/wrong.impex");
 		assertNotNull(defaultCloudStorageFacade.download(taskInfoData));
-		assertNotNull(defaultImportFacade.importData(taskInfoData));
+		assertNotNull(defaultIemImportFacade.importData(taskInfoData));
 	}
 
 	@Test(expected = IemException.class)
@@ -85,7 +85,7 @@ public class DefaultImportFacadeIntegrationTest extends ServicelayerTransactiona
 		TaskInfoData taskInfoData = initDTO(AWS_TEST_STORAGE_CONFIG_CODE);
 		taskInfoData.setCloudFileDownloadPath("hybris-importexportcloud-plugin:wrong.zip");
 		assertNotNull(defaultCloudStorageFacade.download(taskInfoData));
-		assertNotNull(defaultImportFacade.importData(taskInfoData));
+		assertNotNull(defaultIemImportFacade.importData(taskInfoData));
 	}
 
 	@Test(expected = IemException.class)
@@ -95,10 +95,10 @@ public class DefaultImportFacadeIntegrationTest extends ServicelayerTransactiona
 		taskInfoData.setConfig(storageConfigData);
 		taskInfoData.setCloudFileDownloadPath("hybris-importexportcloud-plugin:impex.zip");
 		assertNotNull(defaultCloudStorageFacade.download(taskInfoData));
-		assertNotNull(defaultImportFacade.importData(taskInfoData));
+		assertNotNull(defaultIemImportFacade.importData(taskInfoData));
 	}
 
-	private TaskInfoData initDTO(String storageConfig)
+	private TaskInfoData initDTO(final String storageConfig)
 	{
 		storageConfigData = storageConfigFacade.getStorageConfigData(storageConfig);
 		TaskInfoData taskInfoData = new TaskInfoData();

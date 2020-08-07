@@ -1,12 +1,47 @@
-INSERT_UPDATE ContentCatalog;id[unique=true];name[lang=de];name[lang=en];
-;testcatalog;;;
+$siteUid = testsite
+$catalog-id = testcatalog
 
-INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];active;defaultCurrency(isocode);languages(isoCode);readPrincipals(uid)
-;testcatalog;Staged;false;;en;;
-;testcatalog;Online;true;;en;;
+$catalogVersion = catalogversion(catalog(id[default=$catalog-id]), version[default='Online'])[unique=true, default=$catalog-id:Online]
 
-INSERT_UPDATE BaseStore;uid[unique=true];catalogs(id)
-;defaultstore;;
 
-INSERT_UPDATE CMSSite;uid[unique=true];name[lang=en];stores(uid);contentCatalogs(id);urlPatterns;defaultCatalog(id);previewURL;validComponentTypes(code)
-;testsite;My Site;defaultstore;testcatalog;;;;AbstractCMSComponent,AbstractCMSComponentContainer,SimpleCMSComponent
+INSERT_UPDATE RendererTemplate; &siteMapRenderer            ; code[unique = true]         ; contextClass                                                           ; rendererType(code)[default = 'velocity']                               ; content(&siteMapMediaId)                ;
+                                                            ; $siteUid-siteMapTemplate    ; $siteUid-siteMapTemplate                                               ;                                                                        ;                                         ; $siteUid-siteMapMedia    ;
+                                                            ; anothersite-siteMapTemplate ; anothersite-siteMapTemplate                                            ;                                                                        ;                                         ; anothersite-siteMapMedia ;
+
+INSERT_UPDATE SiteMapConfig; &siteMapConfigId      ; configId[unique = true]; siteMapTemplate(&siteMapRenderer)[unique = true];
+                           ; $siteUidSiteMapConfig ; $siteUidSiteMapConfig  ; $siteUid-siteMapTemplate                        ;
+
+INSERT_UPDATE ContentCatalog; id[unique = true]; name[lang = de]; name[lang = en];
+                            ; $catalog-id      ;                ;                ;
+                            ; anothercatalog   ;                ;                ;
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique = true]; version[unique = true]; active; defaultCurrency(isocode); languages(isoCode); readPrincipals(uid)
+                            ; $catalog-id               ; Staged                ; false ;                         ; en                ; ;
+                            ; $catalog-id               ; Online                ; true  ;                         ; en                ; ;
+                            ; anothercatalog            ; Staged                ; false ;                         ; en                ; ;
+                            ; anothercatalog            ; Online                ; true  ;                         ; en                ; ;
+
+INSERT_UPDATE Category; $catalogVersion; code[unique = true]
+                      ;                ; testcategory1
+                      ;                ; testcategory2
+
+INSERT_UPDATE BaseStore; uid[unique = true]; catalogs(id); warehouses(code);
+                       ; defaultstore      ;             ; testwarehouse
+
+INSERT_UPDATE CMSSite; uid[unique = true]; name        ; stores(uid)  ; contentCatalogs(id); urlPatterns; defaultCatalog(id); previewURL; validComponentTypes(code)                                             ; siteMapConfig(&siteMapConfigId);
+                     ; $siteUid          ; testsite    ; defaultstore ; $catalog-id        ;            ;                   ;           ; AbstractCMSComponent,AbstractCMSComponentContainer,SimpleCMSComponent ; $siteUidSiteMapConfig          ;
+                     ; anothersite       ; anothersite ; defaultstore ; $catalog-id        ;            ;                   ;           ; AbstractCMSComponent,AbstractCMSComponentContainer,SimpleCMSComponent ; $siteUidSiteMapConfig          ;
+
+INSERT_UPDATE ClassificationSystem; id[unique = true]  ; catalogVersions;
+                                  ; testclassification ;
+
+INSERT_UPDATE CatalogUnawareMedia; &siteMapMediaId       ; code[unique = true]   ; catalogVersion;
+                                 ; $siteUid-siteMapMedia ; $siteUid-siteMapMedia ;
+                                 ; anothersite-siteMapMedia ; anothersite-siteMapMedia ;
+
+INSERT_UPDATE CategoryCategoryRelation; source(code, catalogVersion(catalog(id), version))[unique = true]; target(code, catalogVersion(catalog(id), version))[unique = true]
+                                      ; testcategory1:testcatalog:Online                                 ; testcategory2:testcatalog:Online
+
+INSERT_UPDATE EmailPageTemplate; uid[unique = true];$catalogVersion
+                               ; testEmailPageTemplate;
+                               ; testEmailPageTemplate2;

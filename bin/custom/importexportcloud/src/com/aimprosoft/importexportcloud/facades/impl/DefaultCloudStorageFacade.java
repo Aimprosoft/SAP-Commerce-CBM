@@ -1,6 +1,7 @@
 package com.aimprosoft.importexportcloud.facades.impl;
 
 import de.hybris.platform.core.model.media.MediaModel;
+import de.hybris.platform.core.servicelayer.data.SearchPageData;
 import de.hybris.platform.servicelayer.exceptions.ModelRemovalException;
 import de.hybris.platform.servicelayer.media.MediaService;
 import de.hybris.platform.servicelayer.model.ModelService;
@@ -9,7 +10,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Map;
+import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
@@ -23,290 +25,370 @@ import com.aimprosoft.importexportcloud.exceptions.ExportException;
 import com.aimprosoft.importexportcloud.exceptions.IemException;
 import com.aimprosoft.importexportcloud.exceptions.ImportException;
 import com.aimprosoft.importexportcloud.exceptions.InvalidTokenException;
+import com.aimprosoft.importexportcloud.exceptions.MigrationException;
+import com.aimprosoft.importexportcloud.exceptions.TaskException;
 import com.aimprosoft.importexportcloud.facades.CloudStorageFacade;
 import com.aimprosoft.importexportcloud.facades.ExportFacade;
-import com.aimprosoft.importexportcloud.facades.ImportFacade;
+import com.aimprosoft.importexportcloud.facades.IemImportFacade;
+import com.aimprosoft.importexportcloud.facades.MigrationFacade;
 import com.aimprosoft.importexportcloud.facades.data.CloudObjectData;
 import com.aimprosoft.importexportcloud.facades.data.StorageConfigData;
 import com.aimprosoft.importexportcloud.facades.data.TaskInfoData;
 import com.aimprosoft.importexportcloud.model.ImportTaskInfoModel;
 import com.aimprosoft.importexportcloud.model.TaskInfoModel;
+import com.aimprosoft.importexportcloud.service.RemoveDataService;
+import com.aimprosoft.importexportcloud.service.SynchronizationDataHelper;
 import com.aimprosoft.importexportcloud.service.TaskInfoService;
 import com.aimprosoft.importexportcloud.service.connection.ConnectionService;
 import com.aimprosoft.importexportcloud.service.storage.StorageService;
 import com.aimprosoft.importexportcloud.service.validators.StorageConfigValidator;
+import com.aimprosoft.importexportcloud.strategies.IemServiceTypeLocator;
 
 
 public class DefaultCloudStorageFacade implements CloudStorageFacade
 {
-    private static final Logger LOGGER = Logger.getLogger(DefaultCloudStorageFacade.class);
+	private static final Logger LOGGER = Logger.getLogger(DefaultCloudStorageFacade.class);
 
-    private Map<String, StorageService> storageServices;
+	private IemServiceTypeLocator iemServiceTypeLocator;
 
-    private Map<String, ConnectionService> connectionServices;
+	private IemImportFacade iemImportFacade;
 
-    private ImportFacade importFacade;
+	private ExportFacade exportFacade;
 
-    private ExportFacade exportFacade;
+	private MigrationFacade migrationFacade;
 
-    private TaskInfoService<TaskInfoModel> taskInfoService;
+	private TaskInfoService<TaskInfoModel> taskInfoService;
 
-    private StorageConfigValidator storageConfigValidator;
+	private StorageConfigValidator storageConfigValidator;
 
-    private ModelService modelService;
+	private ModelService modelService;
 
-    private MediaService mediaService;
+	private MediaService mediaService;
 
-	 @Override
-	 public void connect(final StorageConfigData configData) throws CloudStorageException
-	 {
-        final ConnectionService connectionService = obtainConnectionService(configData);
+	private RemoveDataService removeDataService;
 
-        connectionService.connect(configData);
-    }
+	private SynchronizationDataHelper synchronizationDataHelper;
 
-    @Override
-    public String getAuthURL(final StorageConfigData configData, final HttpSession httpSession) throws CloudStorageException
-    {
-        final ConnectionService connectionService = obtainConnectionService(configData);
+	@Override
+	public void connect(final StorageConfigData configData) throws CloudStorageException
+	{
+		final ConnectionService connectionService = obtainConnectionService(configData);
 
-        return connectionService.getAuthURL(configData, httpSession);
-    }
+		connectionService.connect(configData);
+	}
 
-    @Override
-    public void checkAccessToken(final StorageConfigData selectedConfigData) throws IemException
-    {
-        try
-        {
-            final ConnectionService connectionService = obtainConnectionService(selectedConfigData);
+	@Override
+	public String getAuthURL(final StorageConfigData configData, final HttpSession httpSession) throws CloudStorageException
+	{
+		final ConnectionService connectionService = obtainConnectionService(configData);
 
-            connectionService.checkAccessToken(selectedConfigData);
-        }
-        catch (final InvalidTokenException e)
-        {
-            clearDataForInvalidToken(selectedConfigData);
-            throw e;
-        }
-    }
+		return connectionService.getAuthURL(configData, httpSession);
+	}
 
-    @Override
-    public TaskInfoData download(final TaskInfoData taskInfoData) throws CloudStorageException
-    {
-        if (LOGGER.isDebugEnabled())
-        {
-            LOGGER.debug(String.format("Start downloading file from [%s]...", taskInfoData.getCloudFileDownloadPathToDisplay()));
-        }
-        final TaskInfoData result;
-        final StorageConfigData storageConfigData = taskInfoData.getConfig();
+	@Override
+	public void checkAccessToken(final StorageConfigData selectedConfigData) throws IemException
+	{
+		try
+		{
+			final ConnectionService connectionService = obtainConnectionService(selectedConfigData);
 
-        final StorageService storageService = obtainStorageService(storageConfigData);
+			connectionService.checkAccessToken(selectedConfigData);
+		}
+		catch (final InvalidTokenException e)
+		{
+			clearDataForInvalidToken(selectedConfigData);
+			throw e;
+		}
+	}
 
-        final ImportTaskInfoModel importTaskInfoModel = taskInfoService.createImportTaskInfoModel(taskInfoData);
+	@Override
+	public TaskInfoData download(final TaskInfoData taskInfoData) throws CloudStorageException
+	{
+		if (LOGGER.isDebugEnabled())
+		{
+			LOGGER.debug(String.format("Start downloading file from [%s]...", taskInfoData.getCloudFileDownloadPathToDisplay()));
+		}
+		final TaskInfoData result;
+		final StorageConfigData storageConfigData = taskInfoData.getConfig();
 
-        taskInfoData.setTaskInfoCode(importTaskInfoModel.getCode());
+		final StorageService storageService = obtainStorageService(storageConfigData);
 
-        try
-        {
-            result = storageService.download(taskInfoData);
-            taskInfoService.setTaskInfoStatus(importTaskInfoModel, TaskInfoStatus.DOWNLOADED);
-        }
-        catch (final CloudStorageException e)
-        {
-            taskInfoService.setTaskInfoStatus(importTaskInfoModel, TaskInfoStatus.FAILED);
-            throw e;
-        }
-        return result;
-    }
+		final ImportTaskInfoModel importTaskInfoModel = taskInfoService.createImportTaskInfoModel(taskInfoData);
 
-    @Override
-    public void disconnect(final StorageConfigData configData) throws CloudStorageException
-    {
-        final ConnectionService connectionService = obtainConnectionService(configData);
-        connectionService.revokeToken(configData);
-    }
+		taskInfoData.setTaskInfoCode(importTaskInfoModel.getCode());
 
-    @Override
-    public TaskInfoData importData(final TaskInfoData taskInfoData) throws ImportException
-    {
-        final TaskInfoData importedTaskInfoData = importFacade.importData(taskInfoData);
-        removeTemporaryFile(importedTaskInfoData);
-        return importedTaskInfoData;
-    }
+		try
+		{
+			result = storageService.download(taskInfoData);
+			taskInfoService.setTaskInfoStatus(importTaskInfoModel, TaskInfoStatus.DOWNLOADED);
+		}
+		catch (final CloudStorageException e)
+		{
+			taskInfoService.setTaskInfoStatus(importTaskInfoModel, TaskInfoStatus.FAILED);
+			throw e;
+		}
+		return result;
+	}
 
-    @Override
-    public TaskInfoData exportData(final TaskInfoData taskInfoData) throws ExportException
-    {
-        return exportFacade.exportData(taskInfoData);
-    }
+	@Override
+	public void disconnect(final StorageConfigData configData) throws CloudStorageException
+	{
+		final ConnectionService connectionService = obtainConnectionService(configData);
+		connectionService.revokeToken(configData);
+	}
 
-    @Override
-    public TaskInfoData upload(final TaskInfoData taskInfoData) throws CloudStorageException {
-        final StorageService storageService = obtainStorageService(taskInfoData.getConfig());
+	@Override
+	public TaskInfoData importData(final TaskInfoData taskInfoData) throws ImportException
+	{
+		return iemImportFacade.importData(taskInfoData);
+	}
 
-        return storageService.upload(taskInfoData);
-    }
+	@Override
+	public TaskInfoData exportData(final TaskInfoData taskInfoData) throws ExportException
+	{
+		return exportFacade.exportData(taskInfoData);
+	}
 
-    @Override
-    public Collection<CloudObjectData> listFiles(final TaskInfoData taskInfoData) throws CloudStorageException {
-        final StorageService storageService = obtainStorageService(taskInfoData.getConfig());
+	@Override
+	public TaskInfoData migrateMediaViaCronJob(final TaskInfoData taskInfoData) throws MigrationException
+	{
+		return migrationFacade.runMigrationCronJob(taskInfoData);
+	}
 
-        return storageService.listFiles(taskInfoData);
-    }
+	@Override
+	public void synchronizeData(final TaskInfoData taskInfoData) throws ImportException, TaskException
+	{
+		try
+		{
+			synchronizationDataHelper.synchronizeData(taskInfoData);
+		}
+		catch (TaskException e)
+		{
+			setFailedTaskInfoStatusAndFinishDate(taskInfoData);
+			throw e;
+		}
+	}
 
-    private ConnectionService obtainConnectionService(final StorageConfigData configData) throws CloudStorageException
-    {
-        storageConfigValidator.validate(configData);
+	@Override
+	public TaskInfoData upload(final TaskInfoData taskInfoData) throws CloudStorageException
+	{
+		final StorageService storageService = obtainStorageService(taskInfoData.getConfig());
 
-        final String storageTypeCode = configData.getStorageTypeData().getCode();
+		return storageService.upload(taskInfoData);
+	}
 
-        return connectionServices.get(storageTypeCode);
-    }
+	@Override
+	public Collection<CloudObjectData> listFiles(final TaskInfoData taskInfoData) throws CloudStorageException
+	{
+		final StorageService storageService = obtainStorageService(taskInfoData.getConfig());
 
-    private StorageService obtainStorageService(final StorageConfigData configData) throws CloudStorageException
-    {
-        storageConfigValidator.validate(configData);
+		return storageService.listFiles(taskInfoData);
+	}
 
-        final String storageTypeCode = configData.getStorageTypeData().getCode();
+	@Override
+	public void removeOldData(final TaskInfoData taskInfoData) throws TaskException
+	{
+		try
+		{
+			removeDataService.removeData(taskInfoData);
+		}
+		catch (TaskException e)
+		{
+			setFailedTaskInfoStatusAndFinishDate(taskInfoData);
+			throw e;
+		}
+	}
 
-        return storageServices.get(storageTypeCode);
-    }
+	private ConnectionService obtainConnectionService(final StorageConfigData configData) throws CloudStorageException
+	{
+		storageConfigValidator.validate(configData);
 
-    public Map<String, StorageService> getStorageServices()
-    {
-        return storageServices;
-    }
+		return iemServiceTypeLocator.getConnectionService(configData);
+	}
 
-    @Required
-    public void setStorageServices(final Map<String, StorageService> storageServices)
-    {
-        this.storageServices = storageServices;
-    }
+	public void setFailedTaskInfoStatusAndFinishDate(final TaskInfoData taskInfoData)
+	{
+		final TaskInfoModel taskInfoModel = taskInfoService.getTaskByCode(taskInfoData.getTaskInfoCode());
+		taskInfoModel.setFinishedDate(new Date());
+		taskInfoService.setTaskInfoStatus(taskInfoModel, TaskInfoStatus.FAILED);
+	}
 
-    private void clearDataForInvalidToken(final StorageConfigData configData)
-    {
-        final TaskInfoData taskInfoData = new TaskInfoData();
-        taskInfoData.setConfig(configData);
-        configData.setIsConnected(Boolean.FALSE);
-        configData.setAuthCode(StringUtils.EMPTY);
-    }
+	public void checkActiveTask() throws CloudStorageException
+	{
+		SearchPageData searchPageData = taskInfoService.getActiveTasks();
+		List tasksInfo = searchPageData.getResults();
 
-    @Override
-    public void removeTemporaryFile(final TaskInfoData taskInfoData)
-    {
-        final String exportedMediaCode = taskInfoData.getExportedMediaCode();
-        final Path importTempFilePath = taskInfoData.getDownloadedFilePath();
+		if (!tasksInfo.isEmpty())
+		{
+			final String code = ((TaskInfoModel) tasksInfo.get(0)).getCode();
+			throw new CloudStorageException("There is active task with code " + code + " at this time");
+		}
+	}
 
-        if (exportedMediaCode != null)
-        {
-            removeMedia(exportedMediaCode);
-        }
-        else if (importTempFilePath != null)
-        {
-            removeFile(importTempFilePath);
-        }
+	private StorageService obtainStorageService(final StorageConfigData configData) throws CloudStorageException
+	{
+		storageConfigValidator.validate(configData);
 
-        if (LOGGER.isDebugEnabled())
-        {
-            LOGGER.debug("Removed temporary file");
-        }
-    }
+		return iemServiceTypeLocator.getStorageService(configData);
+	}
 
-    private void removeMedia(final String mediaCode)
-    {
-        final MediaModel media = mediaService.getMedia(mediaCode);
-        try
-        {
-            mediaService.removeDataFromMedia(media);
+	private void clearDataForInvalidToken(final StorageConfigData configData)
+	{
+		final TaskInfoData taskInfoData = new TaskInfoData();
+		taskInfoData.setConfig(configData);
+		configData.setIsConnected(Boolean.FALSE);
+		configData.setAuthCode(StringUtils.EMPTY);
+	}
 
-            modelService.remove(media);
-        }
-        catch (final ModelRemovalException e)
-        {
-            LOGGER.error("Media with code " + media.getCode() + " could not be deleted: ", e);
-        }
-    }
+	@Override
+	public void removeTemporaryFile(final TaskInfoData taskInfoData)
+	{
+		final String exportedMediaCode = taskInfoData.getExportedMediaCode();
+		final Path importTempFilePath = taskInfoData.getDownloadedFilePath();
 
-    private void removeFile(final Path importTempFilePath)
-    {
-        try
-        {
-            Files.delete(importTempFilePath);
-        }
-        catch (final IOException e)
-        {
-            LOGGER.error("File with path " + importTempFilePath + " could not be deleted: ", e);
-        }
-    }
+		if (exportedMediaCode != null)
+		{
+			removeMedia(exportedMediaCode);
+		}
+		else if (importTempFilePath != null)
+		{
+			removeFile(importTempFilePath);
+		}
 
-    public ImportFacade getImportFacade()
-    {
-        return importFacade;
-    }
+		if (LOGGER.isDebugEnabled())
+		{
+			LOGGER.debug("Removed temporary file");
+		}
+	}
 
-    @Required
-    public void setImportFacade(final ImportFacade importFacade)
-    {
-        this.importFacade = importFacade;
-    }
+	private void removeMedia(final String mediaCode)
+	{
+		final MediaModel media = mediaService.getMedia(mediaCode);
+		try
+		{
+			mediaService.removeDataFromMedia(media);
 
-    public ExportFacade getExportFacade()
-    {
-        return exportFacade;
-    }
+			modelService.remove(media);
+		}
+		catch (final ModelRemovalException e)
+		{
+			LOGGER.error("Media with code " + media.getCode() + " could not be deleted: ", e);
+		}
+	}
 
-    @Required
-    public void setExportFacade(final ExportFacade exportFacade)
-    {
-        this.exportFacade = exportFacade;
-    }
+	private void removeFile(final Path importTempFilePath)
+	{
+		try
+		{
+			Files.delete(importTempFilePath);
+		}
+		catch (final IOException e)
+		{
+			LOGGER.error("File with path " + importTempFilePath + " could not be deleted: ", e);
+		}
+	}
 
-    public ModelService getModelService()
-    {
-        return modelService;
-    }
+	public IemImportFacade getImportFacade()
+	{
+		return iemImportFacade;
+	}
 
-    @Required
-    public void setModelService(final ModelService modelService)
-    {
-        this.modelService = modelService;
-    }
+	@Required
+	public void setIemImportFacade(final IemImportFacade iemImportFacade)
+	{
+		this.iemImportFacade = iemImportFacade;
+	}
 
-    @Required
-    public void setMediaService(final MediaService mediaService)
-    {
-        this.mediaService = mediaService;
-    }
+	public ExportFacade getExportFacade()
+	{
+		return exportFacade;
+	}
 
-    public TaskInfoService<TaskInfoModel> getTaskInfoService()
-    {
-        return taskInfoService;
-    }
+	@Required
+	public void setExportFacade(final ExportFacade exportFacade)
+	{
+		this.exportFacade = exportFacade;
+	}
 
-    @Required
-    public void setTaskInfoService(final TaskInfoService<TaskInfoModel> taskInfoService)
-    {
-        this.taskInfoService = taskInfoService;
-    }
+	public ModelService getModelService()
+	{
+		return modelService;
+	}
 
-    public Map<String, ConnectionService> getConnectionServices()
-    {
-        return connectionServices;
-    }
+	@Required
+	public void setModelService(final ModelService modelService)
+	{
+		this.modelService = modelService;
+	}
 
-    @Required
-    public void setConnectionServices(final Map<String, ConnectionService> connectionServices)
-    {
-        this.connectionServices = connectionServices;
-    }
+	@Required
+	public void setMediaService(final MediaService mediaService)
+	{
+		this.mediaService = mediaService;
+	}
 
-    public StorageConfigValidator getStorageConfigValidator()
-    {
-        return storageConfigValidator;
-    }
+	public TaskInfoService<TaskInfoModel> getTaskInfoService()
+	{
+		return taskInfoService;
+	}
 
-    @Required
-    public void setStorageConfigValidator(final StorageConfigValidator storageConfigValidator)
-    {
-        this.storageConfigValidator = storageConfigValidator;
-    }
+	@Required
+	public void setTaskInfoService(final TaskInfoService<TaskInfoModel> taskInfoService)
+	{
+		this.taskInfoService = taskInfoService;
+	}
+
+	public StorageConfigValidator getStorageConfigValidator()
+	{
+		return storageConfigValidator;
+	}
+
+	@Required
+	public void setStorageConfigValidator(final StorageConfigValidator storageConfigValidator)
+	{
+		this.storageConfigValidator = storageConfigValidator;
+	}
+
+	public MigrationFacade getMigrationFacade()
+	{
+		return migrationFacade;
+	}
+
+	@Required
+	public void setMigrationFacade(final MigrationFacade migrationFacade)
+	{
+		this.migrationFacade = migrationFacade;
+	}
+
+	public RemoveDataService getRemoveDataService()
+	{
+		return removeDataService;
+	}
+
+	@Required
+	public void setRemoveDataService(final RemoveDataService removeDataService)
+	{
+		this.removeDataService = removeDataService;
+	}
+
+	public SynchronizationDataHelper getSynchronizationDataHelper()
+	{
+		return synchronizationDataHelper;
+	}
+
+	@Required
+	public void setSynchronizationDataHelper(final SynchronizationDataHelper synchronizationDataHelper)
+	{
+		this.synchronizationDataHelper = synchronizationDataHelper;
+	}
+
+	public IemServiceTypeLocator getIemServiceTypeLocator()
+	{
+		return iemServiceTypeLocator;
+	}
+
+	public void setIemServiceTypeLocator(final IemServiceTypeLocator iemServiceTypeLocator)
+	{
+		this.iemServiceTypeLocator = iemServiceTypeLocator;
+	}
 }

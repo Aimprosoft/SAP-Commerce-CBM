@@ -10,7 +10,7 @@ public abstract class AbstractWidgetUIState implements WidgetUIState
 	private static final String DISCONNECT_BUTTON = "disconnectButton";
 	private WidgetUIContext widgetUIContext;
 
-	public AbstractWidgetUIState(WidgetUIContext widgetUIContext)
+	public AbstractWidgetUIState(final WidgetUIContext widgetUIContext)
 	{
 		this.widgetUIContext = widgetUIContext;
 	}
@@ -30,7 +30,7 @@ public abstract class AbstractWidgetUIState implements WidgetUIState
 		getWidgetUIContext().getButton(CONNECT_STORAGE_CONFIG_BUTTON).setDisabled(true);
 		getWidgetUIContext().getButton(CONNECT_STORAGE_CONFIG_BUTTON).setVisible(true);
 		getWidgetUIContext().getButton("dropBoxAuthButton").setVisible(false);
-		WidgetInstanceManager widgetInstanceManager = getWidgetUIContext().getWidgetInstanceManager();
+		final WidgetInstanceManager widgetInstanceManager = getWidgetUIContext().getWidgetInstanceManager();
 		getWidgetUIContext().getButton(CONNECT_STORAGE_CONFIG_BUTTON).setLabel(widgetInstanceManager.getLabel("storageconfig.button.connect"));
 		disableConfigActions();
 		getWidgetUIContext().getButton(DISCONNECT_BUTTON).setDisabled(true);
@@ -46,7 +46,7 @@ public abstract class AbstractWidgetUIState implements WidgetUIState
 		return widgetUIContext;
 	}
 
-	public void setWidgetUIContext(WidgetUIContext widgetUIContext)
+	public void setWidgetUIContext(final WidgetUIContext widgetUIContext)
 	{
 		this.widgetUIContext = widgetUIContext;
 	}
@@ -61,7 +61,7 @@ public abstract class AbstractWidgetUIState implements WidgetUIState
 	{
 		getWidgetUIContext().getButton(CONNECT_STORAGE_CONFIG_BUTTON).setVisible(true);
 		getWidgetUIContext().getButton(CONNECT_STORAGE_CONFIG_BUTTON).setDisabled(true);
-		WidgetInstanceManager widgetInstanceManager = getWidgetUIContext().getWidgetInstanceManager();
+		final WidgetInstanceManager widgetInstanceManager = getWidgetUIContext().getWidgetInstanceManager();
 		getWidgetUIContext().getButton(CONNECT_STORAGE_CONFIG_BUTTON).setLabel(widgetInstanceManager.getLabel("storageconfig.button.connected"));
 		getWidgetUIContext().getButton("dropBoxAuthButton").setVisible(false);
 		getWidgetUIContext().getButton(DISCONNECT_BUTTON).setDisabled(false);

@@ -14,8 +14,10 @@ public abstract class AbstractCloudDataObjectPopulator
 
 	protected String resolveTitle(final String key)
 	{
-		final String[] split = key.split(STORAGE_PATH_SEPARATOR);
-		return split[split.length - 1];
+		final String splittedPath = StringUtils.removeEnd(key, STORAGE_PATH_SEPARATOR);
+		return splittedPath.contains(STORAGE_PATH_SEPARATOR)
+				? StringUtils.substringAfterLast(splittedPath, STORAGE_PATH_SEPARATOR)
+				: splittedPath;
 	}
 
 	protected String formatDate(final Date date)

@@ -22,11 +22,7 @@ public class ExportTaskInfoNullListCellRenderer extends DefaultListCellRenderer
 	{
 		final Object property = ((ExportTaskInfoModel) object).getProperty(columnConfiguration.getQualifier());
 
-		if (property != null)
-		{
-			super.render(parent, columnConfiguration, object, dataType, widgetInstanceManger);
-		}
-		else
+		if (property == null)
 		{
 			final Label label = new Label(EMPTY_LABEL_TEXT);
 			UITools.modifySClass(label, "yw-listview-cell-label", true);
@@ -34,6 +30,10 @@ public class ExportTaskInfoNullListCellRenderer extends DefaultListCellRenderer
 			parent.appendChild(label);
 			fireComponentRendered(label, parent, columnConfiguration, object);
 			fireComponentRendered(parent, columnConfiguration, object);
+		}
+		else
+		{
+			super.render(parent, columnConfiguration, object, dataType, widgetInstanceManger);
 		}
 	}
 }

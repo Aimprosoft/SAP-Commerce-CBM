@@ -13,6 +13,7 @@ import de.hybris.platform.category.model.CategoryModel;
 import de.hybris.platform.cms2.model.contents.CMSItemModel;
 import de.hybris.platform.cms2.model.contents.ContentCatalogModel;
 import de.hybris.platform.cms2.model.contents.ContentSlotNameModel;
+import de.hybris.platform.cms2.model.processing.CMSVersionGCProcessModel;
 import de.hybris.platform.cms2.model.relations.CMSRelationModel;
 import de.hybris.platform.cms2.model.site.CMSSiteModel;
 import de.hybris.platform.commons.model.renderer.RendererTemplateModel;
@@ -112,6 +113,11 @@ final class ExportTypeCodes
 	static final List<String> SITE_TYPE_CODES = Arrays.asList(
 			CMSSiteModel._TYPECODE,
 			"SolrFacetSearchConfig2CatalogVersionRelation"
+	);
+
+	static final Set<String> UNUSED_GC_PROCESSES = Sets.newHashSet(
+			CMSVersionGCProcessModel._TYPECODE,
+			"CMSVersionGCProcess2CMSVersion"
 	);
 
 	private ExportTypeCodes()

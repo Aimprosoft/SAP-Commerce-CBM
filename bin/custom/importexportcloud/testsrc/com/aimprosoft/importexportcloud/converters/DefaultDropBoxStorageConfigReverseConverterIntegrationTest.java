@@ -45,7 +45,7 @@ public class DefaultDropBoxStorageConfigReverseConverterIntegrationTest extends 
 		dropBoxStorageConfigData = new StorageConfigData();
 		dropBoxStorageConfigData.setCode(dropBoxStorageConfigCode);
 		dropBoxStorageConfigData.setName(dropBoxStorageConfigName);
-		StorageTypeData dropBoxStorageTypeData = new StorageTypeData();
+		final StorageTypeData dropBoxStorageTypeData = new StorageTypeData();
 		dropBoxStorageTypeData.setCode(dropBoxStorageTypeCode);
 		dropBoxStorageConfigData.setStorageTypeData(dropBoxStorageTypeData);
 		dropBoxStorageConfigData.setAppKey(dropBoxStorageConfigAppKey);
@@ -57,7 +57,7 @@ public class DefaultDropBoxStorageConfigReverseConverterIntegrationTest extends 
 	@Test
 	public void testConvert()
 	{
-		DropBoxStorageConfigModel storageConfigModel = converter.convert(dropBoxStorageConfigData);
+		final DropBoxStorageConfigModel storageConfigModel = converter.convert(dropBoxStorageConfigData);
 
 		assertEquals(dropBoxStorageConfigName, storageConfigModel.getName());
 		assertEquals(storageTypeModel, storageConfigModel.getType());

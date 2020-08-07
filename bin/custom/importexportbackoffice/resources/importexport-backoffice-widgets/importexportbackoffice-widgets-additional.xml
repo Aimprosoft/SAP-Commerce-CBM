@@ -2,9 +2,9 @@
          xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widgets.xsd">
 
 	<widget-extension widgetId="iemExplorerTree">
-		<widget id="historyConditionEvaluator" widgetDefinitionId="com.hybris.cockpitng.conditionevaluator"
+		<widget id="iemConditionEvaluator" widgetDefinitionId="com.hybris.cockpitng.conditionevaluator"
 		        slotId="cockpitWidgetChildrenInvisible">
-			<widget id="historyPropertyExtractor" widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
+			<widget id="iemPropertyExtractor" widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
 			        slotId="cockpitWidgetChildrenInvisible">
 				<setting key="expression" type="String">name</setting>
 				<setting key="socketDataType_$T" type="String" value="java.lang.String"/>
@@ -12,23 +12,8 @@
 			</widget>
 			<setting key="expression" type="String">
 				#root instanceof T(com.hybris.cockpitng.tree.node.TypeNode) &amp;&amp;
-				(#root.id EQ 'hmc_type_node_export_task_info' || #root.id EQ 'hmc_type_node_import_task_info')
-			</setting>
-			<setting key="socketDataType_$T" type="String" value="com.hybris.backoffice.navigation.impl.SimpleNode"/>
-			<virtual-sockets/>
-		</widget>
-
-		<widget id="historyConditionEvaluator" widgetDefinitionId="com.hybris.cockpitng.conditionevaluator"
-		        slotId="cockpitWidgetChildrenInvisible">
-			<widget id="historyPropertyExtractor" widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
-			        slotId="cockpitWidgetChildrenInvisible">
-				<setting key="expression" type="String">name</setting>
-				<setting key="socketDataType_$T" type="String" value="java.lang.String"/>
-				<virtual-sockets/>
-			</widget>
-			<setting key="expression" type="String">
-				#root instanceof T(com.hybris.cockpitng.tree.node.TypeNode) &amp;&amp;
-				(#root.id EQ 'hmc_type_node_export_task_info' || #root.id EQ 'hmc_type_node_import_task_info')
+				(#root.id EQ 'hmc_type_node_export_task_info' || #root.id EQ 'hmc_type_node_import_task_info' || #root.id EQ 'hmc_type_tree_solrfacetsearchconfig'
+				|| #root.id EQ 'hmc_typenode_catalogversion'  || #root.id EQ 'hmc_type_node_migration_task_info')
 			</setting>
 			<setting key="socketDataType_$T" type="String" value="com.hybris.backoffice.navigation.impl.SimpleNode"/>
 			<virtual-sockets/>
@@ -37,13 +22,13 @@
 
 	<widget-extension widgetId="iem_content_container">
 
-		<widget id="iemodule_tree_type_history" widgetDefinitionId="com.hybris.cockpitng.collapsiblecontainer"
+		<widget id="iemodule_container" widgetDefinitionId="com.hybris.cockpitng.collapsiblecontainer"
 		        slotId="perspectives"
 		        template="false">
 
-			<widget id="historyAdvancedSearch" widgetDefinitionId="com.hybris.cockpitng.advancedsearch"
+			<widget id="iemAdvancedSearch" widgetDefinitionId="com.hybris.cockpitng.advancedsearch"
 			        slotId="center" template="false">
-				<widget id="historyAdvancedSearchEngine"
+				<widget id="iemAdvancedSearchEngine"
 				        widgetDefinitionId="com.hybris.cockpitng.widgets.common.advancedsearchengine"
 				        slotId="cockpitWidgetChildrenInvisible" template="false">
 					<setting key="widgetStyleAttribute" type="String"></setting>
@@ -51,7 +36,7 @@
 					<setting key="defaultPageSize" type="Integer">10</setting>
 					<virtual-sockets/>
 				</widget>
-				<widget id="historyHmc2list" widgetDefinitionId="com.hybris.cockpitng.collectionBrowser"
+				<widget id="iemHmc2list" widgetDefinitionId="com.hybris.cockpitng.collectionBrowser"
 				        slotId="nestedWidget" template="false">
 					<setting key="itemRenderer" type="String">listViewRenderer</setting>
 					<setting key="socketDataType_$T" type="String">java.lang.Object</setting>
@@ -133,49 +118,49 @@
 		</widget>
 	</widget-extension>
 
-	<widget-connection sourceWidgetId="historyAdvancedSearch" outputId="searchData"
-	                   targetWidgetId="historyAdvancedSearchEngine" inputId="searchData"/>
+	<widget-connection sourceWidgetId="iemAdvancedSearch" outputId="searchData"
+	                   targetWidgetId="iemAdvancedSearchEngine" inputId="searchData"/>
 
-	<widget-connection sourceWidgetId="historyAdvancedSearch" outputId="searchData"
+	<widget-connection sourceWidgetId="iemAdvancedSearch" outputId="searchData"
 	                   targetWidgetId="backofficeSpaceManagement" inputId="searchData"/>
 
-	<widget-connection sourceWidgetId="historyAdvancedSearchEngine" outputId="pageable"
+	<widget-connection sourceWidgetId="iemAdvancedSearchEngine" outputId="pageable"
 	                   targetWidgetId="historyExportTasksWidget" inputId="pageable"/>
 
-	<widget-connection sourceWidgetId="historyAdvancedSearch" outputId="reset"
-	                   targetWidgetId="historyHmc2list" inputId="reset"/>
+	<widget-connection sourceWidgetId="iemAdvancedSearch" outputId="reset"
+	                   targetWidgetId="iemHmc2list" inputId="reset"/>
 
-	<widget-connection sourceWidgetId="historyAdvancedSearch" outputId="autosuggestionQuery"
-	                   targetWidgetId="historyAdvancedSearchEngine" inputId="autosuggestionQuery"/>
+	<widget-connection sourceWidgetId="iemAdvancedSearch" outputId="autosuggestionQuery"
+	                   targetWidgetId="iemAdvancedSearchEngine" inputId="autosuggestionQuery"/>
 
-	<widget-connection sourceWidgetId="historyAdvancedSearchEngine" outputId="pageable"
-	                   targetWidgetId="historyHmc2list" inputId="pageable"/>
+	<widget-connection sourceWidgetId="iemAdvancedSearchEngine" outputId="pageable"
+	                   targetWidgetId="iemHmc2list" inputId="pageable"/>
 
-	<widget-connection sourceWidgetId="historyAdvancedSearchEngine" outputId="fullTextSearchData"
-	                   targetWidgetId="historyAdvancedSearch" inputId="fullTextSearchData"/>
+	<widget-connection sourceWidgetId="iemAdvancedSearchEngine" outputId="fullTextSearchData"
+	                   targetWidgetId="iemAdvancedSearch" inputId="fullTextSearchData"/>
 
-	<widget-connection sourceWidgetId="historyAdvancedSearchEngine" outputId="autosuggestions"
-	                   targetWidgetId="historyAdvancedSearch" inputId="autosuggestions"/>
+	<widget-connection sourceWidgetId="iemAdvancedSearchEngine" outputId="autosuggestions"
+	                   targetWidgetId="iemAdvancedSearch" inputId="autosuggestions"/>
 
-	<widget-connection sourceWidgetId="historyConditionEvaluator" outputId="true"
-	                   targetWidgetId="historyPropertyExtractor" inputId="genericInput"/>
+	<widget-connection sourceWidgetId="iemConditionEvaluator" outputId="true"
+	                   targetWidgetId="iemPropertyExtractor" inputId="genericInput"/>
 
 	<widget-connection sourceWidgetId="historyFulltextSearch" outputId="searchData"
-	                   targetWidgetId="historyAdvancedSearchEngine" inputId="searchData"/>
+	                   targetWidgetId="iemAdvancedSearchEngine" inputId="searchData"/>
 
 	<widget-connection sourceWidgetId="historyFulltextSearch" outputId="searchContextChanged"
-	                   targetWidgetId="historyAdvancedSearchEngine" inputId="changeSearchContext"/>
+	                   targetWidgetId="iemAdvancedSearchEngine" inputId="changeSearchContext"/>
 
 	<widget-connection sourceWidgetId="historyFulltextSearch" outputId="autosuggestionQuery"
-	                   targetWidgetId="historyAdvancedSearchEngine" inputId="autosuggestionQuery"/>
+	                   targetWidgetId="iemAdvancedSearchEngine" inputId="autosuggestionQuery"/>
 
-	<widget-connection sourceWidgetId="historyPropertyExtractor" outputId="genericOutput"
-	                   targetWidgetId="historyAdvancedSearch" inputId="type"/>
+	<widget-connection sourceWidgetId="iemPropertyExtractor" outputId="genericOutput"
+	                   targetWidgetId="iemAdvancedSearch" inputId="type"/>
 
-	<widget-connection sourceWidgetId="historyHmc2list" outputId="selectedItem"
+	<widget-connection sourceWidgetId="iemHmc2list" outputId="selectedItem"
 	                   targetWidgetId="iemEditorArea" inputId="inputObject"/>
 
-	<widget-connection sourceWidgetId="historyAdvancedSearchEngine" outputId="pageable"
+	<widget-connection sourceWidgetId="iemAdvancedSearchEngine" outputId="pageable"
 	                   targetWidgetId="historyImportTasksWidget" inputId="pageable"/>
 
 </widgets>

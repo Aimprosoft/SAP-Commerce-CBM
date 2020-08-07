@@ -1,0 +1,35 @@
+INSERT_UPDATE SolrIndexConfig ; name[unique=true] ; batchSize ; numberOfThreads
+                              ; Default           ; 100       ; 5
+
+INSERT_UPDATE SolrServerConfig ; name[unique=true] ; mode(code) ; username   ; password  ; indexingUsername   ; indexingPassword
+                               ; Default           ; standalone ; solrclient ; client123 ; solrindexingclient ; indexingclient123
+
+INSERT_UPDATE Language;isocode[unique=true];active[default=true];name[lang=de];name[lang=en]
+                      ;en;;Englisch;English
+
+INSERT_UPDATE SolrIndexedType;identifier[unique=true];type(code);
+                             ;testindexedtype;Language;
+                             ;anotherindexedtype;Language;
+
+INSERT_UPDATE SolrSearchConfig; description[unique = true]; pageSize
+                              ; Default                   ; 20
+
+INSERT_UPDATE SolrFacetSearchConfig; name[unique = true]    ; solrServerConfig(name); solrSearchConfig(description); solrIndexConfig(name); solrIndexedTypes(identifier); enabledLanguageFallbackMechanism;
+                                   ; testFacetSearchConfig  ; Default               ; Default            ; Default              ; testindexedtype            ; true                            ;
+                                   ; anotherFacetSearchConfig  ; Default            ; Default            ; Default              ; anotherindexedtype            ; true                            ;
+
+INSERT_UPDATE SolrIndexedProperty; name[unique = true]      ; solrIndexedType(identifier); type(code); fieldValueProvider;
+                                 ; testIndexedProperty      ;testindexedtype ; long    ; referenceValueResolver        ;
+                                 ; anotherIndexedProperty   ;anotherindexedtype ; long    ; referenceValueResolver        ;
+
+INSERT_UPDATE SolrValueRangeSet; name[unique = true]      ; type  ; indexedProperties(name);
+                               ;  testSolrValueRangeSet; double; testIndexedProperty;
+                               ;  anotherSolrValueRangeSet; double; anotherIndexedProperty;
+
+UPDATE CMSSite;uid[unique=true];solrFacetSearchConfiguration(name);
+              ;testsite;testFacetSearchConfig;
+
+INSERT_UPDATE SolrIndexerQuery;solrIndexedType(identifier)[unique=true];identifier[unique=true];type(code);injectCurrentDate[default=true];injectCurrentTime[default=true];injectLastIndexTime[default=true];query;user(uid)
+                              ;testindexedtype;test-fullQuery;full;;;false;"SELECT full query for the test";anonymous
+                              ;testindexedtype;test-updateQuery;update;;;;"SELECT update query for the test";anonymous
+                              ;anotherindexedtype;test1-updateQuery;update;;;;"query whith shouldn't be contained after filter";anonymous

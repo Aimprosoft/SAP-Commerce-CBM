@@ -10,13 +10,13 @@ public class AWSs3StorageConfigValidationStrategy extends AbstractStorageConfigV
 		StorageConfigValidationStrategy
 {
 	@Override
-	public void validate(StorageConfigData storageConfigData) throws CloudStorageException
+	public void validate(final StorageConfigData storageConfigData) throws CloudStorageException
 	{
 		super.validate(storageConfigData);
 		validateRegionAndBucketName(storageConfigData);
 	}
 
-	private void validateRegionAndBucketName(StorageConfigData storageConfigData) throws CloudStorageException
+	private void validateRegionAndBucketName(final StorageConfigData storageConfigData) throws CloudStorageException
 	{
 		if (StringUtils.isBlank(storageConfigData.getRegion()))
 		{

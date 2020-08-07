@@ -8,7 +8,7 @@ import de.hybris.platform.impex.jalo.exp.ScriptGenerator;
 public class ProductScriptModifier implements IemScriptModifier
 {
 	@Override
-	public void modify(ScriptGenerator scriptGenerator)
+	public void modify(final ScriptGenerator scriptGenerator)
 	{
 		scriptGenerator.addAdditionalModifier("Product", "europe1prices", "translator", Europe1PricesTranslator.class.getName());//NOSONAR
 		scriptGenerator.addAdditionalModifier("Product", "europe1Discounts", "translator", Europe1ProductDiscountTranslator.class.getName());//NOSONAR

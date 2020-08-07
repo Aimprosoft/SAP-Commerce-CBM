@@ -1,5 +1,6 @@
 package com.aimprosoft.importexportcloud.providers;
 
+import com.aimprosoft.importexportcloud.exceptions.CloudStorageException;
 import com.aimprosoft.importexportcloud.facades.data.StorageConfigData;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
@@ -55,4 +56,14 @@ public interface DropboxConnectionProvider
 	 */
 	String getAuthorizeUrl(final StorageConfigData storageConfigData, final HttpSession httpSession,
 			final String clientIdentifier);
+
+
+	/**
+	 * Obtains valid dropbox path that matches required pattern.
+	 *
+	 * @param path  Path to match
+	 * @return valid path
+	 * @throws CloudStorageException if path is not valid
+	 */
+	String getEnsuredPath(String path) throws CloudStorageException;
 }

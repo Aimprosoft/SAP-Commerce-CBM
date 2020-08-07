@@ -47,6 +47,7 @@ public class DefaultExportFacadeIntegrationTest extends ServicelayerTransactiona
       createCoreData();
       importCsv("/test/test-user.impex", "UTF-8");
       importCsv("/test/test-storage-configs.impex", "UTF-8");
+      importCsv("/test/test-warehouse-vendor-items.impex", "UTF-8");
       importCsv("/test/test-cms-catalog-site.impex", "UTF-8");
    }
 
@@ -110,7 +111,7 @@ public class DefaultExportFacadeIntegrationTest extends ServicelayerTransactiona
       assertNotNull(defaultCloudStorageFacade.upload(taskInfoData));
    }
 
-   private TaskInfoData initTaskInfoData(String config)
+   private TaskInfoData initTaskInfoData(final String config)
    {
       storageConfigData = storageConfigFacade.getStorageConfigData(config);
       TaskInfoData taskInfoData = new TaskInfoData();

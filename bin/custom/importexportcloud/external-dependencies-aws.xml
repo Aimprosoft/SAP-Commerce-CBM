@@ -18,7 +18,7 @@
 	<packaging>jar</packaging>
 
 	<properties>
-		<aws.sdk.version>2.5.1</aws.sdk.version>
+		<aws.sdk.version>2.10.41</aws.sdk.version>
 	</properties>
 
 	<dependencies>

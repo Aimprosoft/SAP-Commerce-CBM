@@ -2,6 +2,7 @@ package com.aimprosoft.importexportcloud.facades;
 
 import com.aimprosoft.importexportcloud.facades.data.StorageConfigData;
 import com.aimprosoft.importexportcloud.model.StorageConfigModel;
+import de.hybris.platform.core.model.media.MediaFolderModel;
 
 import java.util.List;
 
@@ -48,4 +49,21 @@ public interface StorageConfigFacade
 	 * @param code code of storage config to be removed
 	 */
 	void removeStorageConfig(String code);
+
+	/**
+	 * Get storage config data for folder with target storage check
+	 *
+	 * @param folderQualifier qualifier of media folder
+	 * @param withTargetCheck check of storage config
+	 * @return storage config data
+	 */
+	StorageConfigData getStorageConfigForFolder(String folderQualifier, Boolean withTargetCheck);
+
+	/**
+	 * Set storage config for media folder model
+	 *
+	 * @param folder        mediaFolder model
+	 * @param storageConfig storage config data
+	 */
+	void setStorageConfigForFolder(MediaFolderModel folder, StorageConfigData storageConfig);
 }

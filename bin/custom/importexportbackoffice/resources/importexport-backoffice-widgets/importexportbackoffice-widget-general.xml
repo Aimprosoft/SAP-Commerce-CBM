@@ -3,18 +3,21 @@
 
 	<widget-extension widgetId="backofficeMainSlot">
 		<widget id="importExportBackofficePerspective" widgetDefinitionId="com.hybris.cockpitng.borderlayout"
-		        slotId="perspectives" title="importexportbackoffice.perspective.name">
+		        slotId="perspectives" title="importexportbackoffice.perspective.name" access="CBMrole, backofficeworkflowadmin">
 
 			<widget id="iemExplorerTree" widgetDefinitionId="com.hybris.cockpitng.widgets.common.explorertree"
-			        slotId="leftSlot">
+					slotId="leftSlot">
 
 				<widget id="iemExplorerTreeSelectionFirstProxy"
-				        widgetDefinitionId="com.hybris.cockpitng.widgets.common.multiplexer"
-				        slotId="cockpitWidgetChildrenInvisible">
+						widgetDefinitionId="com.hybris.cockpitng.widgets.common.multiplexer"
+						slotId="cockpitWidgetChildrenInvisible">
 					<setting key="iem_expression" type="String"
-					         value="#root.id EQ 'iemodule_tree_navigation_import' || #root.id EQ 'iemodule_tree_navigation_export'"/>
+							 value="#root.id EQ 'iemodule_tree_navigation_import' || #root.id EQ 'iemodule_tree_navigation_export'
+							 || #root.id EQ 'iemodule_tree_navigation_migration'"/>
 					<setting key="history_expression" type="String"
-					         value="#root.id EQ 'hmc_type_node_export_task_info' || #root.id EQ 'hmc_type_node_import_task_info'"/>
+							 value="#root.id EQ 'hmc_type_node_export_task_info' || #root.id EQ 'hmc_type_node_import_task_info'
+							 || #root.id EQ 'hmc_type_node_migration_task_info'  || #root.id EQ 'hmc_type_tree_solrfacetsearchconfig'
+                                    || #root.id EQ 'hmc_typenode_catalogversion'"/>
 					<virtual-sockets>
 						<output id="iem" type="com.hybris.backoffice.navigation.NavigationNode"/>
 						<output id="history" type="com.hybris.backoffice.navigation.NavigationNode"/>
@@ -22,12 +25,14 @@
 				</widget>
 
 				<widget id="iemExplorerTreeSelectionProxy" widgetDefinitionId="com.hybris.cockpitng.widgets.common.multiplexer"
-				        slotId="cockpitWidgetChildrenInvisible">
+						slotId="cockpitWidgetChildrenInvisible">
 					<setting key="import_expression" type="String" value="#root.id EQ 'iemodule_tree_navigation_import'"/>
 					<setting key="export_expression" type="String" value="#root.id EQ 'iemodule_tree_navigation_export'"/>
+					<setting key="migration_expression" type="String" value="#root.id EQ 'iemodule_tree_navigation_migration'"/>
 					<virtual-sockets>
 						<output id="import" type="com.hybris.backoffice.navigation.NavigationNode"/>
 						<output id="export" type="com.hybris.backoffice.navigation.NavigationNode"/>
+						<output id="migration" type="com.hybris.backoffice.navigation.NavigationNode"/>
 					</virtual-sockets>
 				</widget>
 
@@ -107,10 +112,11 @@
 
 						<setting key="selectiemImportBorderLayoutView_eval" type="String" value="'iemImportBorderLayoutView'"/>
 						<setting key="selectiemExportBorderLayoutView_eval" type="String" value="'iemExportBorderLayoutView'"/>
-
+						<setting key="selectiemMigrationBorderLayoutView_eval" type="String" value="'iemMigrationBorderLayoutView'"/>
 						<virtual-sockets>
 							<input id="selectiemImportBorderLayoutView" type="java.lang.Object"/>
 							<input id="selectiemExportBorderLayoutView" type="java.lang.Object"/>
+							<input id="selectiemMigrationBorderLayoutView" type="java.lang.Object"/>
 						</virtual-sockets>
 					</widget>
 
@@ -127,7 +133,7 @@
 				</widget>
 
 				<setting key="selectIemPerspective_eval" type="String">'iemMainBorderLayout'</setting>
-				<setting key="selectHistoryPerspective_eval" type="String">'iemodule_tree_type_history'</setting>
+				<setting key="selectHistoryPerspective_eval" type="String">'iemodule_container'</setting>
 				<virtual-sockets>
 					<input id="selectIemPerspective" type="java.lang.Object" visibility="external"/>
 					<input id="selectHistoryPerspective" type="java.lang.Object" visibility="external"/>
@@ -170,7 +176,7 @@
 	                   targetWidgetId="iemExplorerTreeSelectionProxy" inputId="element"/>
 
 	<widget-connection sourceWidgetId="iemExplorerTree" outputId="nodeSelected"
-	                   targetWidgetId="historyConditionEvaluator" inputId="input"/>
+	                   targetWidgetId="iemConditionEvaluator" inputId="input"/>
 
 	<widget-connection sourceWidgetId="iemExplorerTreeSelectionProxy" outputId="import"
 	                   targetWidgetId="iemViewSwitcher" inputId="selectiemImportBorderLayoutView"/>
@@ -183,12 +189,6 @@
 
 	<widget-connection sourceWidgetId="cloudpopupwidget" outputId="chosenExportObject"
 	                   targetWidgetId="exportPathWidget" inputId="inputChoosenObject"/>
-
-	<widget-connection sourceWidgetId="iemViewSwitcher" outputId="selectedViews"
-	                   targetWidgetId="exportPathWidget" inputId="selectedView"/>
-
-	<widget-connection sourceWidgetId="iemViewSwitcher" outputId="selectedViews"
-	                   targetWidgetId="importPathWidget" inputId="selectedView"/>
 
 	<widget-connection sourceWidgetId="importStorageConfigWidget" outputId="outputObject"
 	                   targetWidgetId="storageConfigEditorArea" inputId="inputObject"/>

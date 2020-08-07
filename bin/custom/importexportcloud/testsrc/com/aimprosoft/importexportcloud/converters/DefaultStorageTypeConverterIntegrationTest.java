@@ -43,7 +43,7 @@ public class DefaultStorageTypeConverterIntegrationTest extends ServicelayerTran
 	@Test
 	public void testConvert()
 	{
-		StorageTypeData storageTypeData = converter.convert(storageTypeModel);
+		final StorageTypeData storageTypeData = converter.convert(storageTypeModel);
 		assertEquals(storageTypeCode, storageTypeData.getCode());
 		assertEquals(storageTypeName, storageTypeData.getName());
 		assertEquals(storageTypeIsLocal, storageTypeData.getIsLocal());

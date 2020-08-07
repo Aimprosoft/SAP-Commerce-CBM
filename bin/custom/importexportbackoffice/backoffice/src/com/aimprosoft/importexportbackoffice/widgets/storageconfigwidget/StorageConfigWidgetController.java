@@ -1,34 +1,23 @@
 package com.aimprosoft.importexportbackoffice.widgets.storageconfigwidget;
 
-import de.hybris.platform.servicelayer.session.SessionService;
-
-import java.util.List;
-import java.util.Optional;
-
-import javax.servlet.http.HttpSession;
-
-import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.event.Events;
-import org.zkoss.zk.ui.select.annotation.WireVariable;
-import org.zkoss.zul.Button;
-import org.zkoss.zul.Combobox;
-import org.zkoss.zul.Comboitem;
-import org.zkoss.zul.ListModelList;
-import org.zkoss.zul.Messagebox;
-import org.zkoss.zul.Vlayout;
-
 import com.aimprosoft.importexportbackoffice.widgets.handlers.WidgetHandler;
 import com.aimprosoft.importexportbackoffice.widgets.state.WidgetUIContext;
-import com.aimprosoft.importexportcloud.facades.CloudStorageFacade;
 import com.aimprosoft.importexportcloud.facades.StorageConfigFacade;
 import com.aimprosoft.importexportcloud.facades.StorageTypeFacade;
 import com.aimprosoft.importexportcloud.facades.data.StorageConfigData;
 import com.aimprosoft.importexportcloud.facades.data.StorageTypeData;
 import com.aimprosoft.importexportcloud.model.StorageConfigModel;
-import com.hybris.backoffice.widgets.notificationarea.NotificationService;
 import com.hybris.cockpitng.annotations.SocketEvent;
 import com.hybris.cockpitng.annotations.ViewEvent;
 import com.hybris.cockpitng.util.DefaultWidgetController;
+import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.event.Events;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zul.*;
+
+import javax.servlet.http.HttpSession;
+import java.util.List;
+import java.util.Optional;
 
 
 public class StorageConfigWidgetController extends DefaultWidgetController //NOSONAR
@@ -54,15 +43,6 @@ public class StorageConfigWidgetController extends DefaultWidgetController //NOS
 
 	@WireVariable
 	private transient StorageConfigFacade storageConfigFacade;
-
-	@WireVariable
-	private transient NotificationService notificationService;
-
-	@WireVariable
-	private transient CloudStorageFacade cloudStorageFacade;
-
-	@WireVariable
-	private transient SessionService sessionService;
 
 	@Override
 	public void initialize(final Component comp)

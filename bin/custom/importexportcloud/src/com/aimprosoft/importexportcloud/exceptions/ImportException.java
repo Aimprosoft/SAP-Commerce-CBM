@@ -6,27 +6,27 @@ import com.aimprosoft.importexportcloud.model.TaskInfoModel;
 @SuppressWarnings("unused")
 public class ImportException extends IemException
 {
-	public ImportException(String message, TaskInfoModel taskInfoModel)
+	public ImportException(final String message, final TaskInfoModel taskInfoModel)
 	{
 		super(message, taskInfoModel);
 	}
 
-	public ImportException(Throwable cause, TaskInfoModel taskInfoModel)
+	public ImportException(final Throwable cause, final TaskInfoModel taskInfoModel)
 	{
 		super(cause, taskInfoModel);
 	}
 
-	public ImportException(String message, Throwable cause)
+	public ImportException(final String message, final Throwable cause)
 	{
 		super(message, cause);
 	}
 
-	public ImportException(String message, Throwable cause, TaskInfoModel taskInfoModel)
+	public ImportException(final String message, final Throwable cause, final TaskInfoModel taskInfoModel)
 	{
 		super(message, cause, taskInfoModel);
 	}
 
-	public ImportException(String message)
+	public ImportException(final String message)
 	{
 		super(message);
 	}

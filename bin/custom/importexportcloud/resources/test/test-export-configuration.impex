@@ -1,0 +1,2 @@
+INSERT_UPDATE IemExportConfiguration;code[unique=true];description;classificationTypeCodes;productTypeCodes;contentTypeCodes;siteTypeCodes
+                                    ;defaultIemExportConfiguration;Default configutation for exporting;Product;CmsSite;Product;Product;

@@ -85,8 +85,8 @@ public class DefaultCloudStorageFacadeIntegrationTest extends ServicelayerTransa
 	public void getAuthURL() throws CloudStorageException
 	{
 		initDTO();
-		HttpSession session = new MockHttpSession();
-		String authUrl = defaultCloudStorageFacade.getAuthURL(storageConfigData, session);
+		final HttpSession session = new MockHttpSession();
+		final String authUrl = defaultCloudStorageFacade.getAuthURL(storageConfigData, session);
 		assertTrue(authUrl.contains(DROPBOX_AUTH2_SUBSTRING));
 	}
 
@@ -95,9 +95,9 @@ public class DefaultCloudStorageFacadeIntegrationTest extends ServicelayerTransa
 	@Test
 	public void uploadDropBox() throws CloudStorageException
 	{
-		TaskInfoData taskInfoData = getTaskInfoData();
+		final TaskInfoData taskInfoData = getTaskInfoData();
 
-		StorageConfigData storageConfigData = storageConfigFacade.getStorageConfigData(DROPBOX_TEST_STORAGE_CONFIG_CODE);
+		final StorageConfigData storageConfigData = storageConfigFacade.getStorageConfigData(DROPBOX_TEST_STORAGE_CONFIG_CODE);
 		taskInfoData.setConfig(storageConfigData);
 
 		defaultCloudStorageFacade.upload(taskInfoData);
@@ -106,9 +106,9 @@ public class DefaultCloudStorageFacadeIntegrationTest extends ServicelayerTransa
 	@Test
 	public void uploadS3() throws CloudStorageException
 	{
-		TaskInfoData taskInfoData = getTaskInfoData();
+		final TaskInfoData taskInfoData = getTaskInfoData();
 
-		StorageConfigData storageConfigData = storageConfigFacade.getStorageConfigData(AWS_TEST_STORAGE_CONFIG_CODE);
+		final StorageConfigData storageConfigData = storageConfigFacade.getStorageConfigData(AWS_TEST_STORAGE_CONFIG_CODE);
 		taskInfoData.setConfig(storageConfigData);
 
 		defaultCloudStorageFacade.upload(taskInfoData);
@@ -117,7 +117,7 @@ public class DefaultCloudStorageFacadeIntegrationTest extends ServicelayerTransa
 	@Test
 	public void download() throws CloudStorageException
 	{
-		TaskInfoData taskInfoData = new TaskInfoData();
+		final TaskInfoData taskInfoData = new TaskInfoData();
 		initDTO();
 		taskInfoData.setConfig(storageConfigData);
 		taskInfoData.setCloudFileDownloadPath("/mock.zip");
@@ -127,17 +127,17 @@ public class DefaultCloudStorageFacadeIntegrationTest extends ServicelayerTransa
 	@Test
 	public void downloadS3() throws CloudStorageException
 	{
-		TaskInfoData taskInfoData = new TaskInfoData();
+		final TaskInfoData taskInfoData = new TaskInfoData();
 		initDTOaws();
 		taskInfoData.setConfig(storageConfigData);
-		taskInfoData.setCloudFileDownloadPath("/mock.zip");
+		taskInfoData.setCloudFileDownloadPath("mock.zip");
 		assertNotNull(defaultCloudStorageFacade.download(taskInfoData));
 	}
 
 	@Test(expected = CloudStorageException.class)
 	public void downloadAWSWrongPath() throws CloudStorageException
 	{
-		TaskInfoData taskInfoData = new TaskInfoData();
+		final TaskInfoData taskInfoData = new TaskInfoData();
 		initDTOaws();
 		taskInfoData.setConfig(storageConfigData);
 		taskInfoData.setCloudFileDownloadPath("wrong:impex.zip");
@@ -147,7 +147,7 @@ public class DefaultCloudStorageFacadeIntegrationTest extends ServicelayerTransa
 	@Test(expected = CloudStorageException.class)
 	public void downloadAWSWrongFile() throws CloudStorageException
 	{
-		TaskInfoData taskInfoData = new TaskInfoData();
+		final TaskInfoData taskInfoData = new TaskInfoData();
 		initDTOaws();
 		taskInfoData.setConfig(storageConfigData);
 		taskInfoData.setCloudFileDownloadPath("hybris-importexportcloud-plugin:wrong.zip");
@@ -157,7 +157,7 @@ public class DefaultCloudStorageFacadeIntegrationTest extends ServicelayerTransa
 	@Test(expected = CloudStorageException.class)
 	public void downloadNotExistFile() throws CloudStorageException
 	{
-		TaskInfoData taskInfoData = new TaskInfoData();
+		final TaskInfoData taskInfoData = new TaskInfoData();
 		initDTO();
 		taskInfoData.setConfig(storageConfigData);
 
@@ -168,7 +168,7 @@ public class DefaultCloudStorageFacadeIntegrationTest extends ServicelayerTransa
 	@Test(expected = NullPointerException.class)
 	public void downloadWithEmptyConfig() throws CloudStorageException, IllegalArgumentException
 	{
-		TaskInfoData taskInfoData = new TaskInfoData();
+		final TaskInfoData taskInfoData = new TaskInfoData();
 		assertNull(defaultCloudStorageFacade.download(taskInfoData));
 	}
 

@@ -1,5 +1,6 @@
 package com.aimprosoft.importexportcloud.providers.impl;
 
+import com.aimprosoft.importexportcloud.exceptions.CloudStorageException;
 import com.aimprosoft.importexportcloud.facades.data.StorageConfigData;
 import com.aimprosoft.importexportcloud.providers.DropboxConnectionProvider;
 import com.dropbox.core.*;
@@ -12,11 +13,13 @@ import javax.servlet.http.HttpSession;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.aimprosoft.importexportcloud.constants.ImportexportcloudConstants.ROOT_FOLDER;
+
 
 public class DefaultDropboxConnectionProvider implements DropboxConnectionProvider
 {
 	private static final String DROPBOX_AUTH_CSRF_TOKEN = "dropbox-auth-csrf-token";
-	private static final String DROPBOX_PATH_VALIDATION_PATTERN = "(/(.|[\\r\\n])*|id:.*)|(rev:[0-9a-f]{9,})|(ns:[0-9]+(/.*)?)";
+	private static final Pattern DROPBOX_PATH_VALIDATION_PATTERN = Pattern.compile("(/(.|[\\r\\n])*|id:.*)|(rev:[0-9a-f]{9,})|(ns:[0-9]+(/.*)?)");
 
 	@Override
 	public String getAccessToken(final StorageConfigData storageConfigData, final String clientIdentifier)
@@ -51,8 +54,7 @@ public class DefaultDropboxConnectionProvider implements DropboxConnectionProvid
 	@Override
 	public boolean isDropBoxPathValid(final String path)
 	{
-		final Pattern pattern = Pattern.compile(DROPBOX_PATH_VALIDATION_PATTERN);
-		final Matcher matcher = pattern.matcher(path);
+		final Matcher matcher = DROPBOX_PATH_VALIDATION_PATTERN.matcher(path);
 
 		return matcher.matches();
 	}
@@ -71,6 +73,21 @@ public class DefaultDropboxConnectionProvider implements DropboxConnectionProvid
 		return dbxWebAuth.authorize(dbxWebAuthRequest);
 	}
 
+	public String getEnsuredPath(String path) throws CloudStorageException
+	{
+		if (StringUtils.isBlank(path))
+		{
+			path = ROOT_FOLDER;
+		}
+		final String normalizedPath = path.startsWith(ROOT_FOLDER) ? path : ROOT_FOLDER + path;
+		final Matcher matcher = DROPBOX_PATH_VALIDATION_PATTERN.matcher(normalizedPath);
+
+		if (!matcher.matches())
+		{
+			throw new CloudStorageException("Invalid path given. Path:" + path);
+		}
+		return normalizedPath;
+	}
 
 	private DbxWebAuth.Request getDbxWebAuthRequest(final HttpSession httpSession, final String redirectURL, final String key)
 	{

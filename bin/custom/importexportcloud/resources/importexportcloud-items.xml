@@ -27,7 +27,11 @@
 			<value code="Imported"/>
 			<value code="Exporting"/>
 			<value code="Exported"/>
+			<value code="Migrating"/>
+			<value code="PartlyMigrated"/>
+			<value code="Completed"/>
 			<value code="Failed"/>
+			<value code="Aborted"/>
 		</enumtype>
 		<enumtype code="TaskInfoScope">
 			<value code="CatalogScope"/>
@@ -54,12 +58,22 @@
 				<modifiers read="true" write="true" search="true" optional="true" partof="true"/>
 			</targetElement>
 		</relation>
+
+		<relation code="MigrationTaskInfo2MediaFolder"  localized="false" autocreate="true">
+			<sourceElement type="MediaFolder" cardinality="one" qualifier="mediaFolder">
+				<modifiers read="true" write="true" search="true" optional="false"/>
+			</sourceElement>
+			<targetElement type="MigrationTaskInfo" cardinality="many" qualifier="migrationTasks">
+				<modifiers read="true" write="false" search="true" optional="true"/>
+			</targetElement>
+		</relation>
+
 	</relations>
 
 	<itemtypes>
 		<itemtype code="StorageType"
 				  extends="GenericItem">
-			<deployment table="StorageType" typecode="20000"/>
+			<deployment table="StorageType" typecode="27568"/>
 			<attributes>
 				<attribute qualifier="code" type="java.lang.String">
 					<description>Code of the storage type</description>
@@ -100,20 +114,26 @@
 		<itemtype code="StorageConfig"
 				  extends="GenericItem"
 				  abstract="true">
-			<deployment table="StorageConfig" typecode="20001"/>
+			<deployment table="StorageConfig" typecode="27569"/>
 			<attributes>
 				<attribute qualifier="code" type="java.lang.String">
 					<description>Code of the storage type</description>
-					<modifiers initial="true" unique="true"/>
+					<modifiers initial="true"/>
 					<persistence type="property"/>
 				</attribute>
 				<attribute qualifier="name" type="java.lang.String">
 					<persistence type="property"/>
-					<modifiers optional="false"/>
+					<modifiers  initial="true" unique="true" optional="false"/>
 				</attribute>
 				<attribute qualifier="type" type="StorageType">
 					<persistence type="property"/>
 					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="useSignedURLs" type="boolean">
+					<description>Defines if media relocated to the storage should use signed (secure) urls</description>
+					<persistence type="property"/>
+					<modifiers optional="true"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
 				</attribute>
 				<attribute qualifier="isConnected" type="java.lang.Boolean">
 					<persistence type="property"/>
@@ -122,8 +142,8 @@
 				</attribute>
 			</attributes>
 			<indexes>
-				<index name="codeIDX" unique="true">
-					<key attribute="code" />
+				<index name="nameIDX" unique="true">
+					<key attribute="name"/>
                 </index>
 			</indexes>
 		</itemtype>
@@ -144,6 +164,10 @@
 				</persistence>
 				<modifiers encrypted="true" optional="false"/>
 			</attribute>
+            <attribute qualifier="enableSavingUrls" type="java.lang.Boolean">
+                <persistence type="property"/>
+                <defaultvalue>Boolean.TRUE</defaultvalue>
+            </attribute>
 		</attributes>
 		</itemtype>
 
@@ -180,7 +204,7 @@
 		<itemtype code="TaskInfo"
 				  extends="GenericItem"
 				  abstract="true">
-			<deployment table="TaskInfo" typecode="20100"/>
+			<deployment table="TaskInfo" typecode="27668"/>
 			<attributes>
 				<attribute qualifier="code" type="java.lang.String">
 					<description>Code of the task</description>
@@ -195,10 +219,6 @@
 				<attribute qualifier="storageConfig" type="StorageConfig">
 					<description>Storage config responsible for connection</description>
 					<modifiers optional="false"/>
-					<persistence type="property"/>
-				</attribute>
-				<attribute qualifier="storageConfigInfo" type="java.lang.String">
-					<description>StorageConfig.storageType.name : StorageConfig.name to display in editor area </description>
 					<persistence type="property"/>
 				</attribute>
 				<attribute qualifier="status" type="TaskInfoStatus">
@@ -264,9 +284,25 @@
 			</attributes>
 		</itemtype>
 
+		<itemtype code="MigrationTaskInfo" extends="TaskInfo" autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="sourceStorageConfig" type="StorageConfig">
+					<persistence type="property"/>
+					<modifiers optional="true"/>
+				</attribute>
+
+				<attribute qualifier="totalCountMigratedMedia" type="java.lang.Integer">
+					<persistence type="property"/>
+					<modifiers optional="true"/>
+					<defaultvalue>0</defaultvalue>
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
 		<itemtype code="IemExportConfiguration"
 				  extends="GenericItem">
-			<deployment table="IemExportConfigurations" typecode="20003"/>
+			<deployment table="IemExportConfigurations" typecode="27678"/>
 			<attributes>
 				<attribute qualifier="code" type="java.lang.String">
 					<description>Unique code for export configuration</description>
@@ -299,6 +335,70 @@
 					<key attribute="code"/>
 				</index>
 			</indexes>
+		</itemtype>
+
+		<itemtype code="MediaFolder" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="currentStorageConfig" type="StorageConfig">
+					<description>A storage where media is stored</description>
+					<persistence type="property"/>
+					<modifiers optional="true"/>
+				</attribute>
+				<attribute qualifier="targetStorageConfig" type="StorageConfig">
+					<description>A storage where media is relocated during migration</description>
+					<persistence type="property"/>
+					<modifiers optional="true"/>
+				</attribute>
+				<attribute qualifier="blockedForMigration" type="boolean">
+					<persistence type="property"/>
+					<modifiers optional="true"/>
+				</attribute>
+				<attribute qualifier="canMigrate" type="boolean">
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="lastMigrationTaskInfo" type="MigrationTaskInfo">
+					<modifiers read="true" write="true"/>
+					<persistence type="property"/>
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+		<itemtype code="Media" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="targetStorageConfig" type="StorageConfig">
+					<description>A storage where media is relocated during migration</description>
+					<persistence type="property"/>
+					<modifiers optional="true"/>
+				</attribute>
+
+				<attribute qualifier="actualStorage" type="StorageConfig">
+					<description>A storage name where media was relocated after migration</description>
+					<persistence type="property"/>
+				</attribute>
+                <attribute qualifier="storageURL" type="java.lang.String">
+                    <persistence type="property">
+                        <columntype>
+                            <value>HYBRIS.LONG_STRING</value>
+                        </columntype>
+                        <columntype database="oracle">
+                            <value>CLOB</value>
+                        </columntype>
+                        <columntype database="sap">
+                            <value>NCLOB</value>
+                        </columntype>
+                        <columntype database="mysql">
+                            <value>TEXT</value>
+                        </columntype>
+                        <columntype database="sqlserver">
+                            <value>TEXT</value>
+                        </columntype>
+                    </persistence>
+                </attribute>
+				<attribute qualifier="expiredDateForStorageURL" type="java.util.Date">
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
 		</itemtype>
 
 	</itemtypes>

@@ -1,13 +1,18 @@
 package com.aimprosoft.importexportcloud.service;
 
+import de.hybris.platform.core.servicelayer.data.SearchPageData;
+import de.hybris.platform.cronjob.model.CronJobModel;
+import de.hybris.platform.servicelayer.dto.converter.ConversionException;
+
+import java.io.File;
+import java.nio.file.Path;
+
 import com.aimprosoft.importexportcloud.enums.TaskInfoStatus;
+import com.aimprosoft.importexportcloud.exceptions.TaskException;
 import com.aimprosoft.importexportcloud.facades.data.TaskInfoData;
 import com.aimprosoft.importexportcloud.model.ExportTaskInfoModel;
 import com.aimprosoft.importexportcloud.model.ImportTaskInfoModel;
 import com.aimprosoft.importexportcloud.model.TaskInfoModel;
-import de.hybris.platform.core.servicelayer.data.SearchPageData;
-import de.hybris.platform.cronjob.model.CronJobModel;
-import de.hybris.platform.servicelayer.dto.converter.ConversionException;
 
 
 public interface TaskInfoService<T extends TaskInfoModel>
@@ -48,9 +53,16 @@ public interface TaskInfoService<T extends TaskInfoModel>
 	SearchPageData<T> getTasksByUserAndType(String userUid, T type, SearchPageData<T> searchPageData);
 
 	/**
+	 * Get the task info from Json file.
+	 *
+	 * @param filePath path to a json file
+	 */
+	TaskInfoData getTaskInfoFromJSON(final Path filePath) throws TaskException;
+
+	/**
 	 * Creates and persists export task info model from storage configuration data.
 	 *
-	 * @param taskInfoData   task information
+	 * @param taskInfoData task information
 	 * @return persisted export task info model
 	 * @throws ConversionException if combination of task scope, site and catalog version is not valid
 	 */
@@ -59,7 +71,7 @@ public interface TaskInfoService<T extends TaskInfoModel>
 	/**
 	 * Creates and persists import task info model from storage configuration data.
 	 *
-	 * @param taskInfoData   task information
+	 * @param taskInfoData task information
 	 * @return persisted import task info model
 	 */
 	ImportTaskInfoModel createImportTaskInfoModel(TaskInfoData taskInfoData);
@@ -90,9 +102,22 @@ public interface TaskInfoService<T extends TaskInfoModel>
 	/**
 	 * Sets cronjob and saves task info model.
 	 *
-	 * @param taskInfoModel task info to set finished date
-	 * @param cronJobModel  cronjob to set
+	 * @param taskInfoModel  task info to set finished date
+	 * @param cronJobModel   cronjob to set
 	 * @param taskInfoStatus status to set
 	 */
 	void updateTaskInfo(TaskInfoModel taskInfoModel, CronJobModel cronJobModel, TaskInfoStatus taskInfoStatus);
+
+	/**
+	 * Generate json service file from TaskInfoData.
+	 *
+	 * @param taskInfoData task information
+	 */
+	File generateJsonFileWithServiceData(TaskInfoData taskInfoData);
+
+	/**
+	 * Get active taskInfo tasks
+	 *
+	 */
+	SearchPageData<TaskInfoModel> getActiveTasks();
 }

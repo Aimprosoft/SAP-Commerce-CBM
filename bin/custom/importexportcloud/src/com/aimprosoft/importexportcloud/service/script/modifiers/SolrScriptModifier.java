@@ -6,7 +6,7 @@ import de.hybris.platform.impex.jalo.exp.ScriptGenerator;
 public class SolrScriptModifier implements IemScriptModifier //NOSONAR
 {
 	@Override
-	public void modify(ScriptGenerator scriptGenerator)
+	public void modify(final ScriptGenerator scriptGenerator)
 	{
 		scriptGenerator.addAdditionalModifier("SolrValueRange", "name", "unique", "true");//NOSONAR
 		scriptGenerator.addAdditionalModifier("SolrValueRange", "solrValueRangeSet", "unique", "true");//NOSONAR

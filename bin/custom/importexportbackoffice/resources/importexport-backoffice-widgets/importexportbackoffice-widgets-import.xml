@@ -16,7 +16,7 @@
 	                   targetWidgetId="cloudpopupwidget" inputId="inputImportConfig"/>
 
 	<widget-connection sourceWidgetId="importPathWidget" outputId="outputSearchData"
-	                   targetWidgetId="historyAdvancedSearchEngine" inputId="searchData"/>
+	                   targetWidgetId="iemAdvancedSearchEngine" inputId="searchData"/>
 
 </widgets>
 

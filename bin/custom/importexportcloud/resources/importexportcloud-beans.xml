@@ -16,6 +16,7 @@
 		<property name="storageTypeData" type="StorageTypeData" equals="true"/>
 		<property name="isConnected" type="java.lang.Boolean"/>
 		<property name="rootFolder" type="java.lang.String"/>
+		<property name="useSignedUrls" type="boolean"/>
 		<!--aws s3-->
 		<property name="appKey" type="java.lang.String"/>
 		<property name="region" type="java.lang.String"/>
@@ -24,11 +25,13 @@
 		<!--dropBox-->
 		<property name="authCode" type="java.lang.String"/>
 		<property name="accessToken" type="java.lang.String"/>
+		<property name="enableSavingUrls" type="java.lang.Boolean"/>
 	</bean>
 
 	<bean class="com.aimprosoft.importexportcloud.facades.data.TaskInfoData">
 		<property name="config" type="StorageConfigData"/>
-		<property name="taskInfoCode" type="String"/>
+		<property name="sourceConfigCode" type="java.lang.String"/>
+		<property name="taskInfoCode" type="java.lang.String"/>
 		<property name="cloudFolderPath" type="java.lang.String"/>
 		<property name="cloudFileDownloadPath" type="java.lang.String"/>
 		<property name="cloudFileDownloadPathToDisplay" type="java.lang.String"/>
@@ -42,12 +45,26 @@
 		<property name="realFileName" type="java.lang.String"/>
 		<property name="exportedMediaCode" type="java.lang.String"/>
 		<property name="cmsSiteUid" type="java.lang.String"/>
+		<property name="mediaFolderQualifier" type="java.lang.String"/>
+		<property name="resultSize" type="java.lang.Long"/>
 		<!--catalogVersionModel.catalog + ":" +  catalogVersionModel.version		-->
 		<property name="catalogIdAndVersionName" type="java.lang.String"/>
 		<property name="taskInfoScopeCode" type="java.lang.String"/>
 		<property name="exportMediaNeeded" type="boolean"/>
 		<property name="migrateMediaNeeded" type="boolean"/>
 		<property name="isExport" type="java.lang.Boolean"/>
+		<property name="removeDataNeeded" type="boolean"/>
+		<property name="synchronizeDataNeeded" type="boolean"/>
+		<property name="migrationMediaMimeType" type="java.lang.String"/>
+	</bean>
+
+	<bean class="com.aimprosoft.importexportcloud.facades.data.MediaFolderData">
+		<property name="qualifier" type="java.lang.String"/>
+		<property name="useConfigurableStrategy" type="boolean"/>
+		<property name="storageConfigCode" type="String"/>
+		<property name="storageConfigName" type="String"/>
+		<property name="canMigrate" type="boolean"/>
+		<property name="storageTypeName" type="String"/>
 	</bean>
 
 	<bean class="com.aimprosoft.importexportcloud.facades.data.CloudObjectData">

@@ -23,6 +23,10 @@ public final class ImportexportcloudConstants extends GeneratedImportexportcloud
 
 	public static final String IEM_TRANSMIT_FILE_EXTENSION = ".zip";
 
+	public static final String LOCAL_STORAGE_CONFIG = "localStorageConfig";
+
+	public static final String LOCAL_STORAGE_TYPE_NAME = "Local storage";
+
 	private ImportexportcloudConstants()
 	{
 		//empty to avoid instantiating this constant class

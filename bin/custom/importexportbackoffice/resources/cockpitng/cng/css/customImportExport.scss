@@ -4,6 +4,21 @@
     padding: 20px 40px 0 40px;
 }
 
+.panel-label {
+    font-family:'Open Sans','Arial','Sans-serif';
+    color:rgb(4, 50, 99);
+    font-size:16px;
+    font-style:normal;
+    font-weight:600;
+    text-align:left;
+    text-overflow:ellipsis;
+    text-size-adjust:100%;
+}
+
+.warning-label-message{
+    color: red;
+}
+
 .z-combobox-pp,
 .z-combobox-content {
     display: inline-block;

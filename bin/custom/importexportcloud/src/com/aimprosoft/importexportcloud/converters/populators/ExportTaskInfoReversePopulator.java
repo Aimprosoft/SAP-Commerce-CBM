@@ -57,10 +57,13 @@ public class ExportTaskInfoReversePopulator implements Populator<TaskInfoData, E
 		}
 	}
 
-	private String getExternalPath(String folderPath, final String resultPrefix, final String modelCode)
+	private String getExternalPath(final String folderPath, final String resultPrefix, final String modelCode)
 	{
-		folderPath = folderPath.endsWith(STORAGE_PATH_SEPARATOR) ? folderPath : (folderPath + STORAGE_PATH_SEPARATOR);
-		return folderPath + generateExportFileName(resultPrefix, modelCode);
+		final String localFolderPath = folderPath.endsWith(STORAGE_PATH_SEPARATOR)
+				? folderPath
+				: folderPath + STORAGE_PATH_SEPARATOR;
+
+		return localFolderPath + generateExportFileName(resultPrefix, modelCode);
 	}
 
 	private void validateSourceParameters(final TaskInfoScope taskInfoScope, final CMSSiteModel cmsSiteModel,

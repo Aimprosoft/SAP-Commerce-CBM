@@ -1,0 +1,16 @@
+INSERT_UPDATE StorageType;code[unique=true];name;local;default;authNeeded
+                         ;aWSs3StorageType; Amazon S3;false;false;false
+                         ;dropBoxStorageType;Dropbox;false;false;true
+                         ;localStorageType;Local storage;true;true;false
+
+INSERT_UPDATE LocalStorageConfig;code;name[unique=true];type(code);user(UID)
+                                ;localStorageConfig;Local config;localStorageType;admin
+
+INSERT_UPDATE AWSs3StorageConfig;code;name[unique=true];type(code);appKey;region;encodedAppSecret;user(UID);bucketName;useSignedURLs;
+                                ;aWSs3StorageConfig1;nikonova;aWSs3StorageType;AKIAIQK5UONPYQPZFPJQ;eu-central-1;RRS9ZHyyAu45vDln7L5hsQDty3VLKTfosQ0SMpEo;cbmuser;aimprosoftplugin;true
+;aWSs3StorageConfig3;AIM S3 config3;aWSs3StorageType;AKIAVI2L3K7ODTSA3HS2;us-east-1;djcIpow/uQMB67XbmqIYY/cNuYBhH1/dRmSl1Mw6;cbmuser;hybris-importexportcloud-plugin;true
+
+INSERT_UPDATE DropBoxStorageConfig;code;name[unique=true];type(code);appKey;encodedAppSecret;user(UID);useSignedURLs
+                                  ;dropBoxStorageConfig1;Dropbox Storage Roman;dropBoxStorageType;0mv1xclx6nzs4u4;75yafnjvq3zk50b;cbmuser;true
+
+

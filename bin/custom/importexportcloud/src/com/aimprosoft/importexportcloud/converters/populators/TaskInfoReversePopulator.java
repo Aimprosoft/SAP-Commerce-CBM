@@ -35,9 +35,6 @@ public class TaskInfoReversePopulator implements Populator<TaskInfoData, TaskInf
 			taskInfoModel.setUser(userService.getCurrentUser());
 			taskInfoModel.setStorageConfig(storageConfigModel);
 			taskInfoModel.setExportMediaNeeded(taskInfoData.isExportMediaNeeded());
-
-			final String storageTypeName = storageConfigData.getStorageTypeData().getName();
-			taskInfoModel.setStorageConfigInfo(storageTypeName + " : " + storageConfigData.getName());
 		}
 	}
 

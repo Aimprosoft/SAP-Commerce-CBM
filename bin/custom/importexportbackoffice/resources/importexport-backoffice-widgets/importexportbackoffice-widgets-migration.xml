@@ -1,0 +1,30 @@
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widgets.xsd">
+
+	<widget-extension widgetId="iemViewSwitcher">
+		<widget id="iemMigrationBorderLayoutView" widgetDefinitionId="com.hybris.cockpitng.borderlayout"
+				slotId="views" title="migration.view">
+					<widget id="migrationStartWidget"
+							widgetDefinitionId="com.aimprosoft.importexportbackoffice.widgets.migrationstartwidget"
+							slotId="centerSlot">
+					</widget>
+			<setting key="southCollapsible" type="Boolean" value="false"/>
+			<setting key="southDisabled" type="Boolean" value="false"/>
+			<setting key="westDisabled" type="Boolean" value="true"/>
+			<setting key="eastDisabled" type="Boolean" value="true"/>
+		</widget>
+	</widget-extension>
+
+	<widget-connection sourceWidgetId="iemExplorerTreeSelectionProxy" outputId="migration"
+					   targetWidgetId="iemViewSwitcher" inputId="selectiemMigrationBorderLayoutView"/>
+
+	<widget-connection sourceWidgetId="importStorageConfigWidget" outputId="outputStorageConfigData"
+					   targetWidgetId="migrationStartWidget" inputId="inputStorageConfigData"/>
+
+	<widget-connection sourceWidgetId="importStorageConfigWidget" outputId="reset"
+					   targetWidgetId="migrationStartWidget" inputId="reset"/>
+
+	<widget-connection sourceWidgetId="iemViewSwitcher" outputId="selectedViews"
+					   targetWidgetId="migrationStartWidget" inputId="selectedView"/>
+
+</widgets>

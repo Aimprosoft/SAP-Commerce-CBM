@@ -7,7 +7,7 @@ import com.aimprosoft.importexportcloud.service.validators.strategies.StorageCon
 public class LocalStorageValidationStrategy implements StorageConfigValidationStrategy
 {
 	@Override
-	public void validate(StorageConfigData storageConfigData)
+	public void validate(final StorageConfigData storageConfigData)
 	{
 		// for general validation flow
 	}

@@ -12,23 +12,16 @@ import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxWebAuth;
 import de.hybris.bootstrap.annotations.UnitTest;
 import de.hybris.platform.servicelayer.session.SessionService;
-import de.hybris.platform.util.Config;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 @UnitTest
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({ Config.class })
 public class DropBoxStorageServiceUnitTest
 {
 	private static final String TEST_CONFIG_CODE = "testCode";
@@ -59,7 +52,7 @@ public class DropBoxStorageServiceUnitTest
 	public void setUp()
 	{
 		MockitoAnnotations.initMocks(this);
-		dropBoxConnectionService = Mockito.spy(new DefaultDropBoxConnectionService());
+		dropBoxConnectionService = spy(new DefaultDropBoxConnectionService());
 		dropBoxConnectionService.setSessionService(sessionService);
 		dropBoxConnectionService.setStorageConfigValidator(storageConfigValidator);
 		dropBoxConnectionService.setStorageConfigService(storageConfigService);
@@ -71,11 +64,6 @@ public class DropBoxStorageServiceUnitTest
 	public void testConnection() throws CloudStorageException, DbxException
 	{
 		StorageConfigData config = getStorageConfig();
-
-		PowerMockito.mockStatic(Config.class);
-
-		String key = "cloud.storage." + config.getStorageTypeData().getCode() + ".redirectUrl";
-		when(Config.getString(key, "")).thenReturn("testUrl");
 
 		DbxWebAuth dbxWebAuth = mock(DbxWebAuth.class);
 

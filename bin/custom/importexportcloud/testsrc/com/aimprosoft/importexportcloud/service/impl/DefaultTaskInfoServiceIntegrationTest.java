@@ -141,7 +141,7 @@ public class DefaultTaskInfoServiceIntegrationTest extends ServicelayerTransacti
 		Assert.assertEquals("Wrong task code retured", task.getCode(), code);
 	}
 
-	private <T extends TaskInfoModel> void testGetTasksByTypeAndUser(T type, List<String> expectedCodes)
+	private <T extends TaskInfoModel> void testGetTasksByTypeAndUser(final T type, final List<String> expectedCodes)
 	{
 		SearchPageData<TaskInfoModel> searchResult = taskInfoService.getTasksByUserAndType(USER_UID, type, searchPageData);
 		List<TaskInfoModel> tasks = searchResult.getResults();
@@ -149,7 +149,7 @@ public class DefaultTaskInfoServiceIntegrationTest extends ServicelayerTransacti
 		Assert.assertTrue("Invalid tasks list content", taskListMatches(tasks, expectedCodes));
 	}
 
-	private <T extends TaskInfoModel> boolean taskListMatches(List<T> tasks, List<String> expectedCodes)
+	private <T extends TaskInfoModel> boolean taskListMatches(final List<T> tasks, final List<String> expectedCodes)
 	{
 		return tasks.stream()
 				.map(TaskInfoModel::getCode)

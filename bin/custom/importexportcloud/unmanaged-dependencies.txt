@@ -1,1 +1,1 @@
-aws-bundle-shade-2.5.1.jar
+aws-bundle-shade-2.10.41.jar

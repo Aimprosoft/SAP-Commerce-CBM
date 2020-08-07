@@ -16,7 +16,7 @@ public class ContentComposedTypesGenerator extends AbstractComposedTypesGenerato
 	@Override
 	protected Set<ComposedType> getComposedTypesInternal()
 	{
-		Set<ComposedType> result = new HashSet<>();
+		final Set<ComposedType> result = new HashSet<>();
 
 		result.addAll(getCMSBasedComposedTypes());
 		result.addAll(getComposedTypesFromCmsRelatedExtensions());
@@ -31,7 +31,7 @@ public class ContentComposedTypesGenerator extends AbstractComposedTypesGenerato
 
 	private Set<ComposedType> getCMSBasedComposedTypes()
 	{
-		TypeManager typeManager = TypeManager.getInstance();
+		final TypeManager typeManager = TypeManager.getInstance();
 
 		return CMS_ROOT_TYPE_CODES.stream()
 				.map(rootTypeCode -> typeManager.getComposedType(rootTypeCode).getAllSubTypes())
@@ -41,11 +41,12 @@ public class ContentComposedTypesGenerator extends AbstractComposedTypesGenerato
 
 	private Set<ComposedType> getComposedTypesFromCmsRelatedExtensions()
 	{
-		Set<? extends ComposedType> allComposedTypes = TypeManager.getInstance().getAllComposedTypes();
+		final Set<? extends ComposedType> allComposedTypes = TypeManager.getInstance().getAllComposedTypes();
 
 		return allComposedTypes.stream()
 				.filter(composedType -> !composedType.isAbstract() && !isEnum(composedType)
-						&& (CMS_RELATED_EXTENSION_NAMES.contains(composedType.getExtensionName())))
+						&& CMS_RELATED_EXTENSION_NAMES.contains(composedType.getExtensionName())
+						&& !UNUSED_GC_PROCESSES.contains(composedType.getCode()))
 				.collect(Collectors.toSet());
 	}
 }

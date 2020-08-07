@@ -27,7 +27,7 @@ public class WidgetUIContext
 
 	private HttpSession httpSession;
 
-	private boolean isResetNeeded;
+	private boolean resetNeeded;
 
 	private final Map<String, Button> buttons;
 	private final Map<String, InputElement> elementsMap;
@@ -154,11 +154,11 @@ public class WidgetUIContext
 
 	public boolean isResetNeeded()
 	{
-		return isResetNeeded;
+		return resetNeeded;
 	}
 
 	public void setResetNeeded(final boolean resetNeeded)
 	{
-		isResetNeeded = resetNeeded;
+		this.resetNeeded = resetNeeded;
 	}
 }

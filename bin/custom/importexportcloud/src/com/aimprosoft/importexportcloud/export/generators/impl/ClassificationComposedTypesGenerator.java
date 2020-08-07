@@ -13,7 +13,7 @@ public class ClassificationComposedTypesGenerator extends AbstractComposedTypesG
 	@Override
 	protected Set<ComposedType> getComposedTypesInternal()
 	{
-		HashSet<ComposedType> result = new HashSet<>();
+		final HashSet<ComposedType> result = new HashSet<>();
 
 		result.addAll(getComposedTypesFromTypeCodes(CLASSIFICATION_CATALOG_AND_SOLR_TYPE_CODES));
 		result.addAll(getComposedTypesFromTypeCodes(getExportConfigurationService().getClassificationAdditionalTypes()));

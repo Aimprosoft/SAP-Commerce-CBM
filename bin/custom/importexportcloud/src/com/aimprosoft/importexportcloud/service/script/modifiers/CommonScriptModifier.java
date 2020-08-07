@@ -6,7 +6,7 @@ import de.hybris.platform.impex.jalo.exp.ScriptGenerator;
 public class CommonScriptModifier implements IemScriptModifier
 {
 	@Override
-	public void modify(ScriptGenerator scriptGenerator)
+	public void modify(final ScriptGenerator scriptGenerator)
 	{
 		scriptGenerator.addIgnoreColumn("ComposedType", "superType");
 		scriptGenerator.addIgnoreColumn("Item", "owner");

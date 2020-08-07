@@ -2,6 +2,7 @@ package com.aimprosoft.importexportbackoffice.widgets.handlers.impl;
 
 import static com.aimprosoft.importexportbackoffice.widgets.storageconfigwidget.DefaultWidgetHelper.OUTPUT_SOCKET_OUTPUT_STORAGE_CONFIG_DATA;
 import static com.aimprosoft.importexportbackoffice.widgets.storageconfigwidget.DefaultWidgetHelper.OUTPUT_SOCKET_OUTPUT_STORAGE_TYPE;
+import static com.aimprosoft.importexportcloud.constants.ImportexportcloudConstants.LOCAL_STORAGE_CONFIG;
 
 import org.springframework.beans.factory.annotation.Required;
 
@@ -48,7 +49,7 @@ public class DefaultStorageTypeSelectWidgetHandler implements WidgetHandler
 
 	private void handleLocalStorageType(final WidgetInstanceManager widgetInstanceManager, final WidgetUIContext widgetUIContext)
 	{
-		final StorageConfigData localStorageConfig = storageConfigFacade.getStorageConfigData("localStorageConfig");
+		final StorageConfigData localStorageConfig = storageConfigFacade.getStorageConfigData(LOCAL_STORAGE_CONFIG);
 
 		widgetInstanceManager.sendOutput(OUTPUT_SOCKET_OUTPUT_STORAGE_CONFIG_DATA, localStorageConfig);
 

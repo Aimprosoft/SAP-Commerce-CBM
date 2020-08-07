@@ -6,7 +6,7 @@ public enum HandlerTypeEnum
 
 	String typeCode;
 
-	HandlerTypeEnum(String typeCode)
+	HandlerTypeEnum(final String typeCode)
 	{
 		this.typeCode = typeCode;
 	}

@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
 
 import com.aimprosoft.importexportcloud.exceptions.ExportException;
@@ -15,8 +16,10 @@ import com.aimprosoft.importexportcloud.export.filters.ExportFileFilter;
 import com.aimprosoft.importexportcloud.model.ExportTaskInfoModel;
 
 
-public class CatalogRelatedEntriesFilter implements ExportFileFilter
+public class CatalogRelatedEntriesExportFilter extends AbstractExportFileFilter implements ExportFileFilter
 {
+	private static final Logger LOG = Logger.getLogger(CatalogRelatedEntriesExportFilter.class);
+
 	private Set<String> filesToFilter;
 
 	private Collection<ExportFileFilter> exportFileFilters;
@@ -50,6 +53,8 @@ public class CatalogRelatedEntriesFilter implements ExportFileFilter
 			if (filter.isApplicable(exportTaskInfoModel))
 			{
 				filter.filter(exportTaskInfoModel, targetFile);
+				logDebug(LOG, "Target file [%s] with path [%s] export task info [%s] filtered with filter [%s]",
+						targetFile.getFileName(), targetFile, exportTaskInfoModel.getCode(), filter.getClass());
 			}
 		}
 	}

@@ -1,0 +1,10 @@
+$contentCatalog=testcatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$contentCV2=catalogVersion(CatalogVersion.catalog(Catalog.id[default=anothercatalog]),CatalogVersion.version[default=Staged])[default=anothercatalog:Staged]
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true]
+                   ;;testMedia1;
+                   ;;testMedia2;
+
+INSERT_UPDATE Media;$contentCV2[unique=true];code[unique=true]
+                   ;;testMedia3;

@@ -1,18 +1,21 @@
 package com.aimprosoft.importexportcloud.facades;
 
+import static com.aimprosoft.importexportcloud.constants.ImportexportcloudConstants.STORAGE_PATH_SEPARATOR;
+
+import java.util.Collection;
+
+import javax.servlet.http.HttpSession;
+
 import com.aimprosoft.importexportcloud.exceptions.CloudStorageException;
 import com.aimprosoft.importexportcloud.exceptions.ExportException;
 import com.aimprosoft.importexportcloud.exceptions.IemException;
 import com.aimprosoft.importexportcloud.exceptions.ImportException;
+import com.aimprosoft.importexportcloud.exceptions.MigrationException;
+import com.aimprosoft.importexportcloud.exceptions.TaskException;
 import com.aimprosoft.importexportcloud.facades.data.CloudObjectData;
 import com.aimprosoft.importexportcloud.facades.data.StorageConfigData;
 import com.aimprosoft.importexportcloud.facades.data.TaskInfoData;
 import com.dropbox.core.DbxException;
-
-import javax.servlet.http.HttpSession;
-import java.util.Collection;
-
-import static com.aimprosoft.importexportcloud.constants.ImportexportcloudConstants.STORAGE_PATH_SEPARATOR;
 
 
 public interface CloudStorageFacade
@@ -105,6 +108,15 @@ public interface CloudStorageFacade
 	void disconnect(StorageConfigData configData) throws CloudStorageException;
 
 	/**
+	 * Run migration media via cronjob
+	 *
+	 * @param taskInfoData task information DTO
+	 * @return task information DTO
+	 * @throws MigrationException if migration process fails
+	 */
+	TaskInfoData migrateMediaViaCronJob(TaskInfoData taskInfoData) throws MigrationException;
+
+	/**
 	 * Creates CloudObjectData for a root folder.
 	 *
 	 * @return cloud object DTO
@@ -121,4 +133,25 @@ public interface CloudStorageFacade
 
 		return cloudData;
 	}
+
+	/**
+	 * Removes old data.
+	 *
+	 * @param taskInfoData task information
+	 */
+	void removeOldData(TaskInfoData taskInfoData) throws TaskException;
+
+	/**
+	 * Synchronization imported data.
+	 *
+	 * @param taskInfoData task information
+	 */
+	void synchronizeData(TaskInfoData taskInfoData) throws ImportException, TaskException;
+
+	/**
+	 * checks if there are active tasks at this moment. If so, throws IemException
+	 *
+	 * @throws IemException in case there is more than one active task at this moment
+	 */
+	void checkActiveTask() throws CloudStorageException;
 }

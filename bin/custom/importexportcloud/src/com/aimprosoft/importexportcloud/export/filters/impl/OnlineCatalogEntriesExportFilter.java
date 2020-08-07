@@ -1,31 +1,26 @@
 package com.aimprosoft.importexportcloud.export.filters.impl;
 
-import static com.aimprosoft.importexportcloud.constants.ImportexportcloudConstants.ROOT_FOLDER;
+import com.aimprosoft.importexportcloud.exceptions.ExportException;
+import com.aimprosoft.importexportcloud.model.ExportTaskInfoModel;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Required;
 
 import java.io.IOException;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Required;
-
-import com.aimprosoft.importexportcloud.exceptions.ExportException;
-import com.aimprosoft.importexportcloud.export.filters.ExportFileFilter;
-import com.aimprosoft.importexportcloud.model.ExportTaskInfoModel;
+import static com.aimprosoft.importexportcloud.constants.ImportexportcloudConstants.ROOT_FOLDER;
 
 
-public class OnlineCatalogEntriesFilter implements ExportFileFilter
+public class OnlineCatalogEntriesExportFilter extends AbstractExportFileFilter
 {
+	private static final Logger LOG = Logger.getLogger(OnlineCatalogEntriesExportFilter.class);
+
 	private String onlineCatalogVersionName;
 
 	private Set<String> filesToSkip;
@@ -42,11 +37,12 @@ public class OnlineCatalogEntriesFilter implements ExportFileFilter
 			Files.walkFileTree(root, new SimpleFileVisitor<Path>()
 			{
 				@Override
-				public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException
+				public FileVisitResult visitFile(final Path filePath, final BasicFileAttributes attrs) throws IOException
 				{
-					try (final Stream<String> lines = Files.lines(file))
+					try (final Stream<String> lines = Files.lines(filePath))
 					{
-						final String csvFileName = file.getFileName().toString();
+						logDebug(LOG, "Walking file tree: %s ", root);
+						final String csvFileName = filePath.getFileName().toString();
 
 						if (filesToSkip.contains(csvFileName))
 						{
@@ -61,7 +57,8 @@ public class OnlineCatalogEntriesFilter implements ExportFileFilter
 							filteredLines = filterCatalogUnawareMedia(filteredLines);
 						}
 
-						Files.write(file, filteredLines, StandardOpenOption.CREATE);
+						logDebug(LOG, "Lines filtered for file %s, with pass: %s", csvFileName, filePath.toString());
+						copyIntoTargetZip(filteredLines, filePath);
 
 						return FileVisitResult.CONTINUE;
 					}

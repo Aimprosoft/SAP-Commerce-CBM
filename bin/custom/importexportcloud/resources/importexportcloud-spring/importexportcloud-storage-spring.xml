@@ -208,7 +208,11 @@
 		<property name="folderDataConverter" ref="dropBoxFolderDataConverter"/>
 		<property name="clientIdentifier" value="${dbx.request.config.client.identifier}"/>
 		<property name="dropboxConnectionProvider" ref="dropboxConnectionProvider"/>
+		<property name="dropBoxBatchUploadStrategy" ref="dropBoxBatchUploadStrategy"/>
 	</bean>
+
+	<bean name="dropBoxBatchUploadStrategy"
+		  class="com.aimprosoft.importexportcloud.service.storage.impl.DefaultDropBoxBatchUploadStrategy"/>
 
 	<bean name="localStorageService"
 	      class="com.aimprosoft.importexportcloud.service.storage.impl.LocalStorageService"
@@ -236,14 +240,16 @@
 	<alias name="defaultCloudStorageFacade" alias="cloudStorageFacade"/>
 	<bean name="defaultCloudStorageFacade"
 	      class="com.aimprosoft.importexportcloud.facades.impl.DefaultCloudStorageFacade">
-		<property name="storageServices" ref="storageServicesMap"/>
-		<property name="connectionServices" ref="connectionServicesMap"/>
-		<property name="importFacade" ref="importFacade"/>
+		<property name="iemServiceTypeLocator" ref="iemServiceTypeLocator"/>
+		<property name="iemImportFacade" ref="iemImportFacade"/>
 		<property name="exportFacade" ref="exportFacade"/>
 		<property name="modelService" ref="modelService"/>
 		<property name="mediaService" ref="mediaService"/>
 		<property name="taskInfoService" ref="taskInfoService"/>
 		<property name="storageConfigValidator" ref="storageConfigValidator"/>
+		<property name="migrationFacade" ref="migrationFacade"/>
+		<property name="removeDataService" ref="removeDataService"/>
+		<property name="synchronizationDataHelper" ref="synchronizationDataHelper"/>
 	</bean>
 
 	<alias name="defaultStorageConfigFacade" alias="storageConfigFacade"/>
@@ -255,6 +261,7 @@
 		<property name="storageConfigConverters" ref="storageConfigConverters"/>
 		<property name="storageConfigReverseConverters" ref="storageConfigReverseConverters"/>
 		<property name="typeConfigClassMap" ref="typeConfigClassMap"/>
+		<property name="mediaService" ref="mediaService"/>
 	</bean>
 
 	<alias name="defaultStorageTypeFacade" alias="storageTypeFacade"/>
@@ -336,5 +343,34 @@
 		<entry key="aWSs3StorageType" value-ref="aWSs3StorageConfigReverseConverter"/>
 		<entry key="dropBoxStorageType" value-ref="dropBoxStorageConfigReverseConverter"/>
 	</util:map>
+
+	<alias name="defaultRemoveDataService" alias="removeDataService"/>
+	<bean id="defaultRemoveDataService" class="com.aimprosoft.importexportcloud.service.impl.DefaultRemoveDataService">
+        <property name="iemCmsSiteService" ref="iemCmsSiteService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="importService" ref="importService"/>
+        <property name="iemCatalogVersionService" ref="iemCatalogVersionService"/>
+        <property name="removeScriptGenerator" ref="removeScriptGenerator"/>
+        <property name="sessionService" ref="sessionService"/>
+        <property name="userService" ref="userService"/>
+        <property name="composedTypesGeneratorsMap" ref="composedTypesGeneratorsMap"/>
+        <property name="taskInfoService" ref="taskInfoService"/>
+		<property name="skipComposedTypeModels">
+			<set>
+				<value>ClassificationClass</value>
+			</set>
+		</property>
+	</bean>
+
+    <alias name="defaultIemSynchronizationService" alias="synchronizationDataHelper"/>
+    <bean id="defaultIemSynchronizationService"
+          class="com.aimprosoft.importexportcloud.service.impl.DefaultSynchronizationDataHelper">
+        <property name="iemCmsSiteService" ref="iemCmsSiteService"/>
+        <property name="iemCatalogVersionService" ref="iemCatalogVersionService"/>
+        <property name="taskInfoService" ref="taskInfoService"/>
+        <property name="catalogSynchronizationService" ref="catalogSynchronizationService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="userService" ref="userService"/>
+	</bean>
 
 </beans>

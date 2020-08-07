@@ -13,7 +13,7 @@ public class SiteComposedTypesGenerator extends AbstractComposedTypesGenerator
 	@Override
 	protected Set<ComposedType> getComposedTypesInternal()
 	{
-		HashSet<ComposedType> result = new HashSet<>();
+		final HashSet<ComposedType> result = new HashSet<>();
 
 		result.addAll(getComposedTypesFromTypeCodes(SITE_TYPE_CODES));
 		result.addAll(getComposedTypesFromTypeCodes(getExportConfigurationService().getSiteAdditionalTypes()));

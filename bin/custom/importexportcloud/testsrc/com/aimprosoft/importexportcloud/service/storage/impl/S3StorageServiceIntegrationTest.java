@@ -19,7 +19,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Collection;
 import java.util.Random;
@@ -35,7 +34,6 @@ public class S3StorageServiceIntegrationTest extends ServicelayerTransactionalTe
     private static final String TEST_FOLDER = "IntegrationTestsFolder/";
     private static final String FILE_NAME_PREFIX = "test_file_";
     private static final String FILE_NAME_SUFFIX = ".zip";
-    private static int FILE_SIZE_IN_BYTES = 1000;
 
     private Path tempFile;
     private StorageConfigData storageConfigData;
@@ -152,34 +150,20 @@ public class S3StorageServiceIntegrationTest extends ServicelayerTransactionalTe
     @Test
     public void testUploadAndDownloadIntoFolder() throws CloudStorageException, IOException
     {
-        tempFile = Files.createTempFile("test-", ".tmp");
-        byte[] outputByteArray = getRandomByteArray(FILE_SIZE_IN_BYTES);
-        ByteArrayInputStream uploadInputStream = new ByteArrayInputStream(outputByteArray);
-        Files.copy(uploadInputStream,tempFile, StandardCopyOption.REPLACE_EXISTING);
-
-        TaskInfoData taskInfoData = getTaskInfoData();
-        taskInfoData.setFileToUploadPath(tempFile);
-
-        String realFileName = FILE_NAME_PREFIX + System.currentTimeMillis() + FILE_NAME_SUFFIX;
-        taskInfoData.setRealFileName(realFileName);
-
-        taskInfoData.setCloudUploadFolderPath(TEST_FOLDER);
-        awSs3StorageService.upload(taskInfoData);
-
-        taskInfoData.setCloudFileDownloadPath(TEST_FOLDER + realFileName);
-        taskInfoData = awSs3StorageService.download(taskInfoData);
-
-        Path downloadedFilePath = taskInfoData.getDownloadedFilePath();
-
-        assertNotNull(downloadedFilePath);
-        assertArrayEquals(outputByteArray, IOUtils.toByteArray(Files.newInputStream(downloadedFilePath)));
+        doCheck(TEST_FOLDER);
     }
 
     @Test
     public void testUploadAndDownloadIntoBucketRoot() throws CloudStorageException, IOException
     {
+        doCheck(ROOT_FOLDER);
+    }
+
+    private void doCheck(String rootFolder) throws IOException, CloudStorageException
+    {
         tempFile = Files.createTempFile("test-", ".tmp");
-        byte[] outputByteArray = getRandomByteArray(FILE_SIZE_IN_BYTES);
+        final  int fileSizeInBytes = 1000;
+        byte[] outputByteArray = getRandomByteArray(fileSizeInBytes);
         ByteArrayInputStream uploadInputStream = new ByteArrayInputStream(outputByteArray);
         Files.copy(uploadInputStream,tempFile, StandardCopyOption.REPLACE_EXISTING);
 
@@ -189,10 +173,15 @@ public class S3StorageServiceIntegrationTest extends ServicelayerTransactionalTe
         String realFileName = FILE_NAME_PREFIX + System.currentTimeMillis() + FILE_NAME_SUFFIX;
         taskInfoData.setRealFileName(realFileName);
 
-        taskInfoData.setCloudUploadFolderPath(ROOT_FOLDER);
+        taskInfoData.setCloudUploadFolderPath(rootFolder);
         awSs3StorageService.upload(taskInfoData);
 
-        taskInfoData.setCloudFileDownloadPath(ROOT_FOLDER + realFileName);
+        taskInfoData.setCloudFileDownloadPath(
+        		ROOT_FOLDER.equals(rootFolder)
+				  ? realFileName
+              : rootFolder + realFileName
+		  );
+
         taskInfoData = awSs3StorageService.download(taskInfoData);
 
         Path downloadedFilePath = taskInfoData.getDownloadedFilePath();
@@ -255,23 +244,6 @@ public class S3StorageServiceIntegrationTest extends ServicelayerTransactionalTe
      */
 
     @Test(expected = CloudStorageException.class)
-    public void testUploadEmptyPath() throws CloudStorageException
-    {
-        TaskInfoData taskInfoData = getTaskInfoData();
-        taskInfoData.setCloudUploadFolderPath("");
-        taskInfoData.setFileToUploadPath(Paths.get(""));
-        awSs3StorageService.upload(taskInfoData);
-    }
-
-    @Test(expected = CloudStorageException.class)
-    public void testUploadPathIsNotAssigned() throws CloudStorageException
-    {
-        TaskInfoData taskInfoData = getTaskInfoData();
-        taskInfoData.setFileToUploadPath(Paths.get(""));
-        awSs3StorageService.upload(taskInfoData);
-    }
-
-    @Test(expected = CloudStorageException.class)
     public void testUploadWrongBucket() throws CloudStorageException, IOException
     {
         TaskInfoData taskInfoData = getTaskInfoData();
@@ -293,6 +265,7 @@ public class S3StorageServiceIntegrationTest extends ServicelayerTransactionalTe
         taskInfoData.getConfig().setBucketName("no_such_bucket");
         tempFile = Files.createTempFile("test-", ".tmp");
         taskInfoData.setFileToUploadPath(tempFile);
+        taskInfoData.setRealFileName("realFileName");
 
         awSs3StorageService.upload(taskInfoData);
     }

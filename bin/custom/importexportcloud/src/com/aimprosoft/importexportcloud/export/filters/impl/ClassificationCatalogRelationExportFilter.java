@@ -1,27 +1,23 @@
 package com.aimprosoft.importexportcloud.export.filters.impl;
 
-import de.hybris.platform.catalog.model.classification.ClassificationSystemModel;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Required;
-
 import com.aimprosoft.importexportcloud.enums.TaskInfoScope;
 import com.aimprosoft.importexportcloud.exceptions.ExportException;
-import com.aimprosoft.importexportcloud.export.filters.ExportFileFilter;
 import com.aimprosoft.importexportcloud.model.ExportTaskInfoModel;
+import de.hybris.platform.catalog.model.classification.ClassificationSystemModel;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Required;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
 
 
-public class ClassificationCatalogRelationFilter implements ExportFileFilter
+public class ClassificationCatalogRelationExportFilter extends AbstractExportFileFilter
 {
+	private static final Logger LOG = Logger.getLogger(ClassificationCatalogRelationExportFilter.class);
 	private Set<String> filesToFilter;
 
 	@Override
@@ -39,6 +35,7 @@ public class ClassificationCatalogRelationFilter implements ExportFileFilter
 		final Path fileName = exportImpexAndCSVsFilePath.getFileName();
 
 		final String classificationsCatalogId = exportTaskInfoModel.getCatalogVersion().getCatalog().getId();
+		logDebug(LOG, String.format("Filtering classification catalog with id: %s", classificationsCatalogId));
 
 		if (filesToFilter.contains(fileName.toString()))
 		{
@@ -46,20 +43,19 @@ public class ClassificationCatalogRelationFilter implements ExportFileFilter
 		}
 	}
 
-	private void filterClassificationCatalogRelation(final Path file, final String classificationsCatalogId) throws ExportException
+	private void filterClassificationCatalogRelation(final Path filePath, final String classificationsCatalogId) throws ExportException
 	{
-		try (final Stream<String> lines = Files.lines(file))
+		try
 		{
-			/*get only classification to classification relation*/
-			final List<String> filteredLines = lines
-					.filter(line -> line.contains("#") || StringUtils.countMatches(line, classificationsCatalogId) == 2)
-					.collect(Collectors.toList());
+			Predicate<String> catalogPredicate = line ->  StringUtils.countMatches(line, classificationsCatalogId) == 2;
+			final List<String> filteredLines = filterFileLines(filePath, catalogPredicate);
+			logDebug(LOG, "File lines filtered for catalog %s and file %s ", classificationsCatalogId, filePath.toAbsolutePath());
 
-			Files.write(file, filteredLines, StandardOpenOption.CREATE);
+			copyIntoTargetZip(filteredLines, filePath);
 		}
 		catch (final IOException e)
 		{
-			throw new ExportException(String.format("An error occurred while cleaning %s file.", file.getFileName().toString()), e);
+			throw new ExportException(String.format("An error occurred while cleaning %s file.", filePath.getFileName().toString()), e);
 		}
 	}
 

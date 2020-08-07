@@ -2,17 +2,17 @@ package com.aimprosoft.importexportcloud.exceptions;
 
 public class InvalidTokenException extends IemException
 {
-	public InvalidTokenException(String message, Throwable cause)
+	public InvalidTokenException(final String message, final Throwable cause)
 	{
 		super(message, cause);
 	}
 
-	public InvalidTokenException(Throwable cause)
+	public InvalidTokenException(final Throwable cause)
 	{
 		super(cause);
 	}
 
-	public InvalidTokenException(String message)
+	public InvalidTokenException(final String message)
 	{
 		super(message);
 	}

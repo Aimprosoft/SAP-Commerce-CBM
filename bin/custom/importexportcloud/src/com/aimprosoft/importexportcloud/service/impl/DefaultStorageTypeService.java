@@ -1,19 +1,17 @@
 package com.aimprosoft.importexportcloud.service.impl;
 
-import static de.hybris.platform.servicelayer.util.ServicesUtil.validateIfSingleResult;
-import static de.hybris.platform.servicelayer.util.ServicesUtil.validateParameterNotNullStandardMessage;
-import static java.lang.String.format;
-
+import com.aimprosoft.importexportcloud.model.StorageTypeModel;
+import com.aimprosoft.importexportcloud.service.StorageTypeService;
 import de.hybris.platform.servicelayer.internal.dao.GenericDao;
+import org.springframework.beans.factory.annotation.Required;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Required;
-
-import com.aimprosoft.importexportcloud.model.StorageTypeModel;
-import com.aimprosoft.importexportcloud.service.StorageTypeService;
+import static de.hybris.platform.servicelayer.util.ServicesUtil.validateIfSingleResult;
+import static de.hybris.platform.servicelayer.util.ServicesUtil.validateParameterNotNullStandardMessage;
+import static java.lang.String.format;
 
 
 public class DefaultStorageTypeService implements StorageTypeService

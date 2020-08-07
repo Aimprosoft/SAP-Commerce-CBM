@@ -1,9 +1,20 @@
 package com.aimprosoft.importexportcloud.service.storage.impl;
 
-import static com.aimprosoft.importexportcloud.constants.ImportexportcloudConstants.IEM_TRANSMIT_FILE_EXTENSION;
-import static com.aimprosoft.importexportcloud.constants.ImportexportcloudConstants.STORAGE_PATH_SEPARATOR;
-
+import com.aimprosoft.importexportcloud.exceptions.CloudStorageException;
+import com.aimprosoft.importexportcloud.facades.data.CloudObjectData;
+import com.aimprosoft.importexportcloud.facades.data.StorageConfigData;
+import com.aimprosoft.importexportcloud.facades.data.TaskInfoData;
+import com.aimprosoft.importexportcloud.providers.S3ConnectionProvider;
+import com.aimprosoft.importexportcloud.service.storage.StorageService;
 import de.hybris.platform.servicelayer.dto.converter.Converter;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Required;
+import software.amazon.awssdk.core.exception.SdkException;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -12,25 +23,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Required;
-
-import com.aimprosoft.importexportcloud.exceptions.CloudStorageException;
-import com.aimprosoft.importexportcloud.facades.data.CloudObjectData;
-import com.aimprosoft.importexportcloud.facades.data.StorageConfigData;
-import com.aimprosoft.importexportcloud.facades.data.TaskInfoData;
-import com.aimprosoft.importexportcloud.providers.S3ConnectionProvider;
-import com.aimprosoft.importexportcloud.service.storage.StorageService;
-
-import software.amazon.awssdk.core.exception.SdkException;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.CommonPrefix;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
-import software.amazon.awssdk.services.s3.model.ListObjectsResponse;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.S3Object;
+import static com.aimprosoft.importexportcloud.constants.ImportexportcloudConstants.IEM_TRANSMIT_FILE_EXTENSION;
+import static com.aimprosoft.importexportcloud.constants.ImportexportcloudConstants.STORAGE_PATH_SEPARATOR;
 
 
 /**
@@ -60,7 +54,7 @@ public class S3StorageService extends AbstractStorageService
 
 		try
 		{
-			LOGGER.info("Downloading from Amazon S3. Path: " + taskInfoData.getCloudFileDownloadPathToDisplay());
+			LOGGER.debug("Downloading from Amazon S3. Path: " + taskInfoData.getCloudFileDownloadPathToDisplay());
 
 			cloudFileInputStream = s3Client
 					.getObject(GetObjectRequest.builder().bucket(bucketName).key(cloudFileDownloadPath).build());
@@ -80,18 +74,27 @@ public class S3StorageService extends AbstractStorageService
 	public TaskInfoData upload(final TaskInfoData taskInfoData) throws CloudStorageException
 	{
 		final S3Client s3Client = getS3Client(taskInfoData.getConfig());
+		final String cloudUploadFolderPath = taskInfoData.getCloudUploadFolderPath();
+		final String cloudStoragePath = cloudUploadFolderPath.equals(STORAGE_PATH_SEPARATOR) ? StringUtils.EMPTY : cloudUploadFolderPath;
 
-		final String key = taskInfoData.getCloudUploadFolderPath() + taskInfoData.getRealFileName();
+		final String key = cloudStoragePath + taskInfoData.getRealFileName();
 		final Path fileToUploadPath = taskInfoData.getFileToUploadPath();
 		final String bucketName = taskInfoData.getConfig().getBucketName();
 		logUploadingFile(LOGGER, taskInfoData);
 		try
 		{
-			LOGGER.info("Starting uploading file to Amazon S3...");
+			LOGGER.debug("Starting uploading file to Amazon S3...");
 
-			s3Client.putObject(PutObjectRequest.builder().bucket(bucketName).key(key).build(), RequestBody.fromFile(fileToUploadPath));
+			s3Client.putObject(
+					PutObjectRequest.builder()
+							.bucket(bucketName)
+							.key(key)
+							.contentType(taskInfoData.getMigrationMediaMimeType())
+							.contentLength(fileToUploadPath.toFile().length())
+							.build(),
+					RequestBody.fromFile(fileToUploadPath));
 
-			LOGGER.info("Uploading was successful.");
+			LOGGER.debug("Uploading was successful.");
 		}
 		catch (final SdkException e)
 		{
@@ -113,7 +116,6 @@ public class S3StorageService extends AbstractStorageService
 
 		try
 		{
-
 			listObjectsResponse = s3Client.listObjects(
 					ListObjectsRequest.builder().bucket(bucketName).prefix(prefix).delimiter(STORAGE_PATH_SEPARATOR).build());
 		}
@@ -130,6 +132,61 @@ public class S3StorageService extends AbstractStorageService
 		}
 
 		return result;
+	}
+
+	@Override
+	public InputStream getAsStream(final StorageConfigData storageConfig, final String location) throws CloudStorageException
+	{
+		final S3Client s3Client = getS3Client(storageConfig);
+		final String bucket = storageConfig.getBucketName();
+		try
+		{
+			return s3Client.getObject(GetObjectRequest.builder().bucket(bucket).key(location).build());
+		}
+		catch (SdkException e)
+		{
+			throw new CloudStorageException("An error occurred during getting a Stream from Amazon S3", e);
+		}
+
+	}
+
+	@Override
+	public void delete(final StorageConfigData storageConfig, final String location) throws CloudStorageException
+	{
+		final S3Client s3Client = getS3Client(storageConfig);
+		final String bucket = storageConfig.getBucketName();
+		try
+		{
+			DeleteObjectRequest request = DeleteObjectRequest.builder().bucket(bucket).key(location).build();
+			s3Client.deleteObject(request);
+
+			LOGGER.debug("Removed " + location + " from " + storageConfig.getCode());
+		}
+		catch (SdkException e)
+		{
+			throw new CloudStorageException("An error occurred during removing from Amazon S3", e);
+		}
+	}
+
+	@Override
+	public long getSize(final StorageConfigData storageConfig, final String location) throws CloudStorageException
+	{
+		final S3Client s3Client = getS3Client(storageConfig);
+		return getObjectResponse(s3Client, storageConfig, location).contentLength();
+	}
+
+	private GetObjectResponse getObjectResponse(final S3Client s3Client, final StorageConfigData storageConfig, final String location) throws CloudStorageException
+	{
+		final String bucket = storageConfig.getBucketName();
+		try
+		{
+			final GetObjectRequest getObjectRequest = GetObjectRequest.builder().bucket(bucket).key(location).build();
+			return s3Client.getObject(getObjectRequest).response();
+		}
+		catch (SdkException e)
+		{
+			throw new CloudStorageException("An error occurred during getting ObjectResponse from Amazon S3", e);
+		}
 	}
 
 	protected S3Client getS3Client(final StorageConfigData storageConfigData) throws CloudStorageException

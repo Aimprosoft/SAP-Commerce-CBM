@@ -63,7 +63,7 @@ public class DefaultAWSs3StorageConfigConverterIntegrationTest extends Servicela
 	@Test
 	public void testConvert()
 	{
-		StorageConfigData storageConfigData = converter.convert(aWSs3StorageConfigModel);
+		final StorageConfigData storageConfigData = converter.convert(aWSs3StorageConfigModel);
 
 		assertEquals(aWSs3StorageConfigCode, storageConfigData.getCode());
 		assertEquals(aWSs3StorageConfigName, storageConfigData.getName());

@@ -3,7 +3,7 @@ package com.aimprosoft.importexportcloud.service.connection;
 import com.aimprosoft.importexportcloud.exceptions.CloudStorageException;
 import com.aimprosoft.importexportcloud.exceptions.IemException;
 import com.aimprosoft.importexportcloud.facades.data.StorageConfigData;
-import com.aimprosoft.importexportcloud.facades.data.TaskInfoData;
+import de.hybris.platform.media.MediaSource;
 
 import javax.servlet.http.HttpSession;
 
@@ -46,8 +46,19 @@ public interface ConnectionService
 	/**
 	 * Obtains the public URL.
 	 *
-	 * @param taskInfoData task information
+	 * @param storageConfig config information
 	 * @return public URL
 	 */
-	String obtainPublicURL(TaskInfoData taskInfoData);
+	String obtainPublicURL(StorageConfigData storageConfig, String location) throws CloudStorageException;
+
+	/**
+	 * gets the URL.
+	 *
+	 * @param mediaSource media source
+	 * @param storageConfig config information
+	 * @param location media location
+	 * @return URL
+	 */
+	String getUrlForMedia(MediaSource mediaSource, final StorageConfigData storageConfig, final String location)
+			throws CloudStorageException;
 }

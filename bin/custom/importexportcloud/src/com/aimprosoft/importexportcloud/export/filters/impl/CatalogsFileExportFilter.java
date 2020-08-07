@@ -1,30 +1,26 @@
 package com.aimprosoft.importexportcloud.export.filters.impl;
 
+import com.aimprosoft.importexportcloud.enums.TaskInfoScope;
+import com.aimprosoft.importexportcloud.exceptions.ExportException;
+import com.aimprosoft.importexportcloud.model.ExportTaskInfoModel;
+import com.aimprosoft.importexportcloud.service.IemCMSSiteService;
 import de.hybris.platform.catalog.model.CatalogModel;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Required;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.springframework.beans.factory.annotation.Required;
 
-import com.aimprosoft.importexportcloud.enums.TaskInfoScope;
-import com.aimprosoft.importexportcloud.exceptions.ExportException;
-import com.aimprosoft.importexportcloud.export.filters.ExportFileFilter;
-import com.aimprosoft.importexportcloud.model.ExportTaskInfoModel;
-import com.aimprosoft.importexportcloud.service.IemCMSSiteService;
-
-
-public class CatalogsFileFilter implements ExportFileFilter
+public class CatalogsFileExportFilter extends AbstractExportFileFilter
 {
+	private static final Logger LOG = Logger.getLogger(CatalogsFileExportFilter.class);
 	private IemCMSSiteService iemCmsSiteService;
 
 	@Override
@@ -32,13 +28,14 @@ public class CatalogsFileFilter implements ExportFileFilter
 	{
 		final Set<String> catalogNamesToKeep = getCatalogNames(exportTaskInfoModel);
 
-		try (final Stream<String> lines = Files.lines(filePath))
+		try (Stream<String> streamOfLines = Files.lines(filePath))
 		{
-			final List<String> filteredLines = lines
-					.filter(line -> (line.contains("#") || catalogNamesToKeep.stream().anyMatch(line::contains)))
-					.collect(Collectors.toList());
+			Predicate<String> catalogPredicate = line -> catalogNamesToKeep.stream().anyMatch(line::contains);
+			final List<String> filteredLines = filterFileLines(filePath, catalogPredicate);
+			logDebug(LOG, "File has been filtered: %s ", filePath);
 
-			Files.write(filePath, filteredLines, StandardOpenOption.CREATE);
+			copyIntoTargetZip(filteredLines, filePath);
+
 		}
 		catch (final IOException e)
 		{

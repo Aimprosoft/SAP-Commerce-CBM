@@ -16,6 +16,7 @@ public class AppKeyBasedStorageConfigPopulator implements Populator<AppKeyBasedS
 		{
 			target.setAppKey(source.getAppKey());
 			target.setEncodedAppSecret(source.getEncodedAppSecret());
+			target.setEnableSavingUrls(source.getEnableSavingUrls());
 		}
 	}
 }

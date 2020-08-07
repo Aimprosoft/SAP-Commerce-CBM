@@ -5,9 +5,7 @@
 
     <panel sclass="z-top-header">
         <panelchildren>
-            <!--todo add css-->
-            <label style="background-color:#eaedf1; font-family:'Open Sans',Arial,Sans-serif; color:rgb(4, 50, 99)
-; font-size:16px; font-style:normal; font-weight:600; text-align:left; text-overflow:ellipsis;text-size-adjust:100% " value="${labels.task.view.startexport}"/>
+            <label sclass="panel-label" value="${labels.task.view.startexport}"/>
         </panelchildren>
     </panel>
 
@@ -35,7 +33,6 @@
             </radiogroup>
             <checkbox id="exportMediaNeededCheckBox" label="${labels.task.export.include.media}"
                       sclass="primary-widget-label"
-                      forward="onClick=exportMediaNeededCheckBox.onSelectedExportMediaNeeded()"
                       checked="true"
             />
         </hlayout>

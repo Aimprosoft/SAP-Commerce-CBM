@@ -17,12 +17,13 @@ public final class ImportexportbackofficeConstants extends GeneratedImportexport
 {
 	public static final String EXTENSIONNAME = "importexportbackoffice";
 
+	public static final String SELECTED_CONFIG_ATTRIBUTE_CODE = "selectedConfigCode";
+	public static final String DROPBOX_AUTH_CODE_ATTRIBUTE = "dropBoxAuthCode";
+
 	private ImportexportbackofficeConstants()
 	{
 		//empty to avoid instantiating this constant class
 	}
 
-	public static final String SELECTED_CONFIG_ATTRIBUTE_CODE = "selectedConfigCode";
 
-	public static final String DROPBOX_AUTH_CODE_ATTRIBUTE = "dropBoxAuthCode";
 }

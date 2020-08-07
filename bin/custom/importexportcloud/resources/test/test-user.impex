@@ -3,3 +3,9 @@ INSERT_UPDATE UserGroup;UID[unique=true];description
 
 INSERT_UPDATE Employee;UID[unique=true];password[default=1234];description;name;groups(uid);sessionLanguage(isocode);sessionCurrency(isocode)
 ;testUser;;CBM Test User;CBM Test User;CBMgroup;en;EUR
+
+INSERT_UPDATE Employee;UID[unique=true];password;description;name;groups(uid);sessionLanguage(isocode);sessionCurrency(isocode)
+                      ;iemuser;1234;CBM User;CBM User;CBMgroup;en;EUR
+
+
+

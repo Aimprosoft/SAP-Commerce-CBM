@@ -30,7 +30,7 @@ public class DropboxResponseHandlerServlet extends HttpServlet
 		if (StringUtils.isNotBlank(authCode) && StringUtils.isNotBlank(state) && state.equals(dropboxCsrfToken))
 		{
 			final String configCode = (String) JaloSession.getCurrentSession().getAttribute(SELECTED_CONFIG_ATTRIBUTE_CODE);
-			final String[] authCodeArray = new String[] { configCode, authCode };
+			final String[] authCodeArray = { configCode, authCode };
 
 			JaloSession.getCurrentSession().setAttribute(DROPBOX_AUTH_CODE_ATTRIBUTE, authCodeArray);
 

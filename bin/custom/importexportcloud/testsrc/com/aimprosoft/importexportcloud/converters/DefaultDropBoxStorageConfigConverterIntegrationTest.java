@@ -60,7 +60,7 @@ public class DefaultDropBoxStorageConfigConverterIntegrationTest extends Service
 	@Test
 	public void testConvert()
 	{
-		StorageConfigData storageConfigData = converter.convert(dropBoxStorageConfigModel);
+		final StorageConfigData storageConfigData = converter.convert(dropBoxStorageConfigModel);
 
 		assertEquals(dropBoxStorageConfigCode, storageConfigData.getCode());
 		assertEquals(dropBoxStorageConfigName, storageConfigData.getName());

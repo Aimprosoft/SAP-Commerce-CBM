@@ -11,11 +11,13 @@
 
     <import resource="/importexportcloud-spring/importexportcloud-task-spring.xml"/>
 
+    <import resource="/importexportcloud-spring/importexportcloud-migration-spring.xml"/>
+
     <!-- IMPORT -->
 
-    <alias name="defaultImportFacade" alias="importFacade"/>
-    <bean name="defaultImportFacade"
-          class="com.aimprosoft.importexportcloud.facades.impl.DefaultImportFacade">
+    <alias name="defaultIemImportFacade" alias="iemImportFacade"/>
+    <bean name="defaultIemImportFacade"
+          class="com.aimprosoft.importexportcloud.facades.impl.DefaultIemImportFacade">
         <property name="importService" ref="importService"/>
         <property name="taskInfoService" ref="taskInfoService"/>
     </bean>
@@ -36,6 +38,7 @@
         <property name="iemSessionService" ref="iemSessionService"/>
         <property name="iemCMSSiteService" ref="iemCmsSiteService"/>
         <property name="stagedCatalogVersionName" value="${staged.catalog.version.name}"/>
+        <property name="CBMuserUid" value="${cbm.user.uid}"/>
     </bean>
 
     <alias name="defaultIemSessionService" alias="iemSessionService"/>

@@ -1,15 +1,17 @@
 package com.aimprosoft.importexportbackoffice.widgets.exportpathwidget;
 
+import com.aimprosoft.importexportbackoffice.widgets.importpathwidget.AbstractPathWidgetController;
+import com.aimprosoft.importexportcloud.enums.TaskInfoScope;
+import com.aimprosoft.importexportcloud.exceptions.CloudStorageException;
+import com.aimprosoft.importexportcloud.exceptions.ExportException;
+import com.aimprosoft.importexportcloud.facades.data.StorageConfigData;
+import com.aimprosoft.importexportcloud.facades.data.StorageTypeData;
+import com.aimprosoft.importexportcloud.facades.data.TaskInfoData;
+import com.hybris.backoffice.widgets.notificationarea.event.NotificationEvent;
+import com.hybris.cockpitng.annotations.SocketEvent;
+import com.hybris.cockpitng.annotations.ViewEvent;
 import de.hybris.platform.core.model.media.MediaModel;
 import de.hybris.platform.servicelayer.media.MediaService;
-
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.zkoss.zk.ui.Component;
@@ -22,17 +24,12 @@ import org.zkoss.zul.Div;
 import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.Textbox;
 
-import com.aimprosoft.importexportbackoffice.widgets.importpathwidget.AbstractPathWidgetController;
-import com.aimprosoft.importexportcloud.enums.TaskInfoScope;
-import com.aimprosoft.importexportcloud.exceptions.CloudStorageException;
-import com.aimprosoft.importexportcloud.exceptions.ExportException;
-import com.aimprosoft.importexportcloud.facades.data.StorageConfigData;
-import com.aimprosoft.importexportcloud.facades.data.StorageTypeData;
-import com.aimprosoft.importexportcloud.facades.data.TaskInfoData;
-import com.aimprosoft.importexportcloud.model.ExportTaskInfoModel;
-import com.hybris.backoffice.widgets.notificationarea.event.NotificationEvent;
-import com.hybris.cockpitng.annotations.SocketEvent;
-import com.hybris.cockpitng.annotations.ViewEvent;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @SuppressWarnings({ "unused" })
@@ -40,6 +37,7 @@ public class ExportPathWidgetController extends AbstractPathWidgetController
 {
 	private static final Logger LOG = Logger.getLogger(ExportPathWidgetController.class);
 	private static final String EXPORTSTART = "exportstart";
+	private static final String EXPORTBLOCKED = "exportblocked";
 	private static final String OUTPUT_SOCKET_RESET = "reset";
 	private static final String VALIDATION_ERROR_CLASS = "prefixvalidationerror";
 	private static final String EXPORTED_MEDIA_CODE = "exportedMediaCode";
@@ -133,6 +131,16 @@ public class ExportPathWidgetController extends AbstractPathWidgetController
 	@ViewEvent(eventName = Events.ON_CLICK, componentID = "startButton")
 	public void onStartExportButton()
 	{
+		try
+		{
+			cloudStorageFacade.checkActiveTask();
+		}
+		catch (CloudStorageException e)
+		{
+			notifyUser(EXPORTBLOCKED, NotificationEvent.Level.FAILURE, StringUtils.EMPTY, StringUtils.EMPTY);
+			return;
+		}
+
 		/* because you can catch to click start button with invalid prefix before onResultPrefixChange() method invocation */
 		if (!isResultPrefixValid(resultPrefixTextBox.getValue()))
 		{
@@ -165,7 +173,6 @@ public class ExportPathWidgetController extends AbstractPathWidgetController
 
 			exportAndUploadData(taskInfoData);
 
-			sendExportInfoTasksHistoryEvent(ExportTaskInfoModel._TYPECODE);
 			sendOutput(OUTPUT_SOCKET_RESET, null);
 		}
 	}
@@ -216,7 +223,7 @@ public class ExportPathWidgetController extends AbstractPathWidgetController
 		final boolean isResultPrefixValid = (boolean) resultPrefixTextBox.getAttribute(RESULT_PREFIX_IS_VALID_ATTR);
 
 		return isResultPrefixValid && isExportSourceSelected(taskInfoData)
-				&& ((storageConfigData != null && storageConfigData.getStorageTypeData().getIsLocal())
+				&& (storageConfigData != null && storageConfigData.getStorageTypeData().getIsLocal()
 				|| StringUtils.isNotEmpty(realFilePathLabel.getValue()));
 	}
 
@@ -249,7 +256,7 @@ public class ExportPathWidgetController extends AbstractPathWidgetController
 		catch (final CloudStorageException e)
 		{
 			LOG.error(e.getMessage(), e);
-			notifyUser(EXPORTSTART, NotificationEvent.Level.FAILURE, e.getMessage(), StringUtils.EMPTY);
+			notifyUser(EXPORTSTART, NotificationEvent.Level.FAILURE, e.getMessage(), getErrorDetails(e.getTaskInfoModel()));
 		}
 
 		setLayoutAfterExporting(taskInfoData.getConfig());

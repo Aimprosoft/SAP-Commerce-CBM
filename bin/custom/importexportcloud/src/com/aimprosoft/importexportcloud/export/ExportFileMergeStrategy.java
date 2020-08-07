@@ -10,10 +10,11 @@ public interface ExportFileMergeStrategy
 	/**
 	 * Appends all the files from source zip file to target zip file.
 	 *
-	 * @param mergedTarget  zip file to append files
-	 * @param sourceToMerge zip file to get files to append from
+	 * @param exportedMediaFilePath - path to archive with media content
+	 * @param serviceFilePath       - path to serviceFilePath
+	 * @param originalArchive       zip file to which append
 	 * @return {@code mergedTarget}
 	 * @throws ExportException if error occurs while merging
 	 */
-	Path merge(Path mergedTarget, Path sourceToMerge) throws ExportException;
+	Path merge(Path exportedMediaFilePath, Path serviceFilePath, Path originalArchive) throws ExportException;
 }

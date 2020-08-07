@@ -1,7 +1,6 @@
 package com.aimprosoft.importexportcloud.service.connection.impl;
 
 import com.aimprosoft.importexportcloud.facades.data.StorageConfigData;
-import com.aimprosoft.importexportcloud.facades.data.TaskInfoData;
 
 import javax.servlet.http.HttpSession;
 
@@ -21,7 +20,7 @@ public class DefaultLocalConnectionService extends AbstractConnectionService
 	}
 
 	@Override
-	public String obtainPublicURL(final TaskInfoData taskInfoData)
+	public String obtainPublicURL(final StorageConfigData storageConfig, final String location)
 	{
 		throw new UnsupportedOperationException();
 	}

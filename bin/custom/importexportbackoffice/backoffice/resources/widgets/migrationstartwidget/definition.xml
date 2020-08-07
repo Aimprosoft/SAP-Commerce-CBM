@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget-definition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widget-definition.xsd"
+                   id="com.aimprosoft.importexportbackoffice.widgets.migrationstartwidget">
+    <name>Migration Start Widget</name>
+    <description>Widget for starting media migration</description>
+    <defaultTitle>Migration Start Widget</defaultTitle>
+    <author>aimprosoft</author>
+    <version>0.1</version>
+
+    <sockets>
+        <input id="inputFolder" type="java.lang.String"/>
+        <input id="inputStorageConfigData" type="com.aimprosoft.importexportcloud.facades.data.StorageConfigData"/>
+        <input id="reset" type="com.aimprosoft.importexportcloud.facades.data.StorageConfigData"/>
+    </sockets>
+
+    <controller class="com.aimprosoft.importexportbackoffice.widgets.migrationstartwidget.MigrationStartWidgetController"/>
+
+    <keywords>
+        <keyword>Import Export Module</keyword>
+        <keyword>Migration</keyword>
+    </keywords>
+</widget-definition>

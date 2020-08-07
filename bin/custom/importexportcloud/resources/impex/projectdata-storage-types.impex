@@ -3,5 +3,5 @@ INSERT_UPDATE StorageType;code[unique=true];name;local;default;authNeeded
 ;dropBoxStorageType;Dropbox;false;false;true
 ;localStorageType;Local storage;true;true;false
 
-INSERT_UPDATE LocalStorageConfig;code[unique=true];name;type(code);user(UID)
+INSERT_UPDATE LocalStorageConfig;code;name[unique=true];type(code);user(UID)
 ;localStorageConfig;Local config;localStorageType;admin

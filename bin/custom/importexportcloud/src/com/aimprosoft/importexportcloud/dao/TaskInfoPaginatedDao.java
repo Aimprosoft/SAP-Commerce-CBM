@@ -16,4 +16,12 @@ public interface TaskInfoPaginatedDao<T extends TaskInfoModel> extends Paginated
 	 * @return task info search page data for given user and types
 	 */
 	SearchPageData<T> findByUserAndType(String userUid, T type, SearchPageData<T> searchPageData);
+
+	/**
+	 * Gets all task infos which are in progress now.
+	 *
+	 * @param searchPageData pageable search data to identify the current pagination state
+	 * @return task info search page data which are in progress now
+	 */
+	SearchPageData<T> findActiveTasks(SearchPageData<T> searchPageData);
 }

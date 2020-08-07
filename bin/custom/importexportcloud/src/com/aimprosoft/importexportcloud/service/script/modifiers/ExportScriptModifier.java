@@ -28,6 +28,8 @@ public class ExportScriptModifier implements ScriptModifier
 	{
 		if (isExportMedia())
 		{
+			scriptGenerator.addIgnoreColumn("Media", "storageURL");
+			scriptGenerator.addIgnoreColumn("Media", "expiredDateForStorageURL");
 			scriptGenerator.addSpecialColumn("Media", "media[translator=" + MediaDataTranslator.class.getName() + ']');
 		}
 	}

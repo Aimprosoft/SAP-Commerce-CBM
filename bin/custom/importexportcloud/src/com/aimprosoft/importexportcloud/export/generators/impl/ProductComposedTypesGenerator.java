@@ -13,7 +13,7 @@ public class ProductComposedTypesGenerator extends AbstractComposedTypesGenerato
 	@Override
 	protected Set<ComposedType> getComposedTypesInternal()
 	{
-		HashSet<ComposedType> result = new HashSet<>();
+		final HashSet<ComposedType> result = new HashSet<>();
 
 		result.addAll(getComposedTypesFromTypeCodes(PRODUCT_CATALOG_TYPE_CODES));
 		result.addAll(getComposedTypesFromTypeCodes(getExportConfigurationService().getProductAdditionalTypes()));

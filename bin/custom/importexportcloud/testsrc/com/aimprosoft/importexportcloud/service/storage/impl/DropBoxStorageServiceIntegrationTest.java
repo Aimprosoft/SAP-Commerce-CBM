@@ -191,8 +191,8 @@ public class DropBoxStorageServiceIntegrationTest extends ServicelayerTransactio
 	{
 		TaskInfoData taskInfoData = getTaskInfoData(token, appKey, appSecret);
 		Path tempFile = Files.createTempFile("test-", ".tmp");
-		int FILE_SIZE_IN_BYTES = 1001;
-		byte[] outputByteArray = new byte[FILE_SIZE_IN_BYTES];
+		int fileSizeInBytes = 1001;
+		byte[] outputByteArray = new byte[fileSizeInBytes];
 		new Random().nextBytes(outputByteArray);
 		ByteArrayInputStream uploadInputStream = new ByteArrayInputStream(outputByteArray);
 		Files.copy(uploadInputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);

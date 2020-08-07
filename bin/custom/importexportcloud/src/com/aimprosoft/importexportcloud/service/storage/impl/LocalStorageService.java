@@ -1,14 +1,16 @@
 package com.aimprosoft.importexportcloud.service.storage.impl;
 
+import com.aimprosoft.importexportcloud.exceptions.CloudStorageException;
+import com.aimprosoft.importexportcloud.facades.data.CloudObjectData;
+import com.aimprosoft.importexportcloud.facades.data.StorageConfigData;
+import com.aimprosoft.importexportcloud.facades.data.TaskInfoData;
+import org.apache.log4j.Logger;
+
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
-
-import org.apache.log4j.Logger;
-
-import com.aimprosoft.importexportcloud.facades.data.CloudObjectData;
-import com.aimprosoft.importexportcloud.facades.data.TaskInfoData;
 
 
 public class LocalStorageService extends AbstractStorageService
@@ -32,6 +34,24 @@ public class LocalStorageService extends AbstractStorageService
 	{
 		/* the uploading operation is implemented in Backoffice by saving file on local machine */
 		return taskInfoData;
+	}
+
+	@Override
+	public long getSize(final StorageConfigData storageConfig, final String location) throws CloudStorageException
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public InputStream getAsStream(final StorageConfigData storageConfig, final String location) throws CloudStorageException
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void delete(final StorageConfigData storageConfig, final String location) throws CloudStorageException
+	{
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

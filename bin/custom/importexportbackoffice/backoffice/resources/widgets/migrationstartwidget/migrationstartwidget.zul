@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<widget id="migrationStartWidget" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://www.zkoss.org/2005/zul" xmlns:w="client"
+        xmlns:h="http://www.w3.org/1999/xhtml" xmlns:ca="client/attribute">
+
+    <panel sclass="z-top-header">
+        <panelchildren>
+            <label sclass="panel-label" value="${labels.migration.panel.label}"/>
+        </panelchildren>
+    </panel>
+
+    <vlayout id="mainLayout" spacing="25px" width="100%" sclass="iem-main-layout">
+        <vlayout spacing="10px">
+            <label id="mediaFolderLabel" value="${labels.migration.widget.folders.selector}" sclass="primary-widget-label"/>
+            <combobox id="mediaFoldersComboBox" width="280px" readonly="true"
+                      placeholder="${labels.media.folder.placeholder}">
+                <template name="model">
+                    <comboitem label="${each.qualifier}"/>
+                </template>
+            </combobox>
+        </vlayout>
+        <vlayout spacing="10px">
+            <label id="sourceStorageLabel" value="${labels.migration.widget.source.path}" sclass="primary-widget-label"/>
+            <label id="targetStorageLabel" value="${labels.migration.widget.target.path}" sclass="primary-widget-label"/>
+            <label id="matchStoragesWarningLabel" value="${labels.migration.widget.match.storages}" visible="false" sclass="warning-label-message"/>
+        </vlayout>
+        <hlayout>
+            <label id="incompleteMigrationLabel" sclass="incomplete-migration-label"/>
+        </hlayout>
+        <hlayout valign="middle" spacing="50px">
+            <button id="startMigrationButton" width="250px" label="${labels.task.button.start}"/>
+        </hlayout>
+    </vlayout>
+</widget>

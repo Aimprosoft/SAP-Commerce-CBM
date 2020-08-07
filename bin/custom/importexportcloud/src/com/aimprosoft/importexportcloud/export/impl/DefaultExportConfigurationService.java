@@ -85,8 +85,7 @@ public class DefaultExportConfigurationService implements ExportConfigurationSer
 		}
 		catch (final UnknownIdentifierException e)
 		{
-			LOGGER.warn(
-					String.format("No default export configuration found. Additional export types for %s won't be set.", target));
+			LOGGER.warn(format("No default export configuration found. Additional export types for %s won't be set.", target));
 		}
 
 		return result;

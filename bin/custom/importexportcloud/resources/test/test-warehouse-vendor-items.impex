@@ -1,0 +1,7 @@
+INSERT_UPDATE Vendor; code [unique = true]       ; name[lang = en];
+                    ; testvendor                 ; testName
+                    ; anothervendor              ; testName
+
+INSERT_UPDATE Warehouse; code[unique = true]; name[lang = en]; vendor(code)  ; default
+                       ; testwarehouse      ; test Warehouse ; testvendor    ; false
+                       ; anotherwarehouse   ; test Warehouse ; anothervendor ; false

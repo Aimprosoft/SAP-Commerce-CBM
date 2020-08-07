@@ -1,24 +1,22 @@
 package com.aimprosoft.importexportcloud.service.impl;
 
-import static de.hybris.platform.servicelayer.util.ServicesUtil.validateIfSingleResult;
-import static de.hybris.platform.servicelayer.util.ServicesUtil.validateParameterNotNullStandardMessage;
-import static java.lang.String.format;
-
-import de.hybris.platform.core.model.user.UserModel;
-import de.hybris.platform.servicelayer.internal.dao.GenericDao;
-import de.hybris.platform.servicelayer.internal.service.AbstractBusinessService;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Required;
-
 import com.aimprosoft.importexportcloud.model.DropBoxStorageConfigModel;
 import com.aimprosoft.importexportcloud.model.StorageConfigModel;
 import com.aimprosoft.importexportcloud.model.StorageTypeModel;
 import com.aimprosoft.importexportcloud.service.StorageConfigService;
 import com.aimprosoft.importexportcloud.service.StorageTypeService;
+import de.hybris.platform.core.model.user.UserModel;
+import de.hybris.platform.servicelayer.internal.dao.GenericDao;
+import de.hybris.platform.servicelayer.internal.service.AbstractBusinessService;
+import org.springframework.beans.factory.annotation.Required;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static de.hybris.platform.servicelayer.util.ServicesUtil.validateIfSingleResult;
+import static de.hybris.platform.servicelayer.util.ServicesUtil.validateParameterNotNullStandardMessage;
+import static java.lang.String.format;
 
 
 public class DefaultStorageConfigService extends AbstractBusinessService implements StorageConfigService

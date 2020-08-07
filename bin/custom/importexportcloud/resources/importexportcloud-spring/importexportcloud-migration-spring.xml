@@ -1,0 +1,107 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="mediaFolderGenericDao" class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+		<constructor-arg value="MediaFolder"/>
+	</bean>
+
+	<bean id="mediaGenericDao" class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+		<constructor-arg value="Media"/>
+	</bean>
+
+	<alias name="defaultMediaFolderService" alias="mediaFolderService"/>
+	<bean id="defaultMediaFolderService" class="com.aimprosoft.importexportcloud.service.impl.DefaultMediaFolderService">
+		<property name="mediaFolderGenericDao" ref="mediaFolderGenericDao"/>
+	</bean>
+
+    <alias name="defaultMigrationFacade" alias="migrationFacade"/>
+    <bean id="defaultMigrationFacade" class="com.aimprosoft.importexportcloud.facades.impl.DefaultMigrationFacade">
+        <property name="modelService" ref="modelService"/>
+        <property name="storageConfigFacade" ref="storageConfigFacade"/>
+        <property name="cronJobService" ref="cronJobService"/>
+        <property name="keyGenerator" ref="taskInfoCodeGenerator"/>
+        <property name="mediaService" ref="mediaService"/>
+        <property name="userService" ref="userService"/>
+		<property name="migrationTaskInfoReverseConverter" ref="migrationTaskInfoReverseConverter"/>
+	</bean>
+
+    <alias name="defaultMigrationTaskInfoReversePopulator" alias="migrationTaskInfoReversePopulator"/>
+    <bean id="defaultMigrationTaskInfoReversePopulator"
+          class="com.aimprosoft.importexportcloud.converters.populators.MigrationTaskInfoReversePopulator">
+        <property name="storageConfigFacade" ref="storageConfigFacade"/>
+        <property name="keyGenerator" ref="taskInfoCodeGenerator"/>
+        <property name="mediaService" ref="mediaService"/>
+        <property name="userService" ref="userService"/>
+    </bean>
+
+    <alias name="defaultMigrationTaskInfoReverseConverter" alias="migrationTaskInfoReverseConverter"/>
+    <bean id="defaultMigrationTaskInfoReverseConverter" parent="abstractPopulatingConverter">
+        <property name="targetClass" value="com.aimprosoft.importexportcloud.model.MigrationTaskInfoModel"/>
+        <property name="populators">
+            <list>
+                <ref bean="migrationTaskInfoReversePopulator"/>
+            </list>
+        </property>
+    </bean>
+
+	<alias name="defaultMediaFolderPopulator" alias="mediaFolderPopulator"/>
+	<bean id="defaultMediaFolderPopulator"
+		  class="com.aimprosoft.importexportcloud.converters.populators.DefaultMediaFolderPopulator">
+		<property name="mediaStorageConfigService" ref="mediaStorageConfigService"/>
+		<property name="storageConfigFacade" ref="storageConfigFacade"/>
+	</bean>
+
+	<alias name="defaultMediaFolderConverter" alias="mediaFolderConverter"/>
+	<bean id="defaultMediaFolderConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="com.aimprosoft.importexportcloud.facades.data.MediaFolderData"/>
+		<property name="populators">
+			<list>
+				<ref bean="mediaFolderPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+    <bean id="configurableMediaStorageStrategy"
+          class="com.aimprosoft.importexportcloud.strategies.storage.ConfigurableMediaStorageStrategy">
+        <property name="mediaStorageRegistry" ref="defaultMediaStorageRegistry"/>
+        <property name="storageConfigFacade" ref="storageConfigFacade"/>
+        <property name="mediaLocationHashService" ref="mediaLocationHashService"/>
+        <property name="iemServiceTypeLocator" ref="iemServiceTypeLocator"/>
+        <property name="mediaService" ref="mediaService"/>
+    </bean>
+
+	<bean id="configurableMediaUrlStrategy" class="com.aimprosoft.importexportcloud.strategies.url.ConfigurableMediaURLStrategy"/>
+
+	<alias name="configurableMediaStorageRegistry" alias="mediaStorageRegistry" />
+	<bean id="configurableMediaStorageRegistry" class="com.aimprosoft.importexportcloud.strategies.registry.ConfigurableMediaStorageRegistry"/>
+
+	<alias name="defaultMediaFolderFacade" alias="mediaFolderFacade"/>
+	<bean id="defaultMediaFolderFacade" class="com.aimprosoft.importexportcloud.facades.impl.DefaultMediaFolderFacade">
+		<property name="mediaFolderConverter" ref="mediaFolderConverter"/>
+		<property name="mediaFolderService" ref="mediaFolderService"/>
+	</bean>
+
+	<bean id="iemServiceTypeLocator" class="com.aimprosoft.importexportcloud.strategies.IemServiceTypeLocator">
+		<property name="storageServicesMap" ref="storageServicesMap"/>
+		<property name="connectionServicesMap" ref="connectionServicesMap"/>
+	</bean>
+
+	<bean id="configurableMediaMigrationJob" class="com.aimprosoft.importexportcloud.job.ConfigurableMediaMigrationJob">
+		<property name="iemMediaMigrationStrategy" ref="configurableMediaMigrationStrategy"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="modelResolver" ref="modelResolver"/>
+		<property name="eventService" ref="eventService"/>
+		<property name="userService" ref="userService"/>
+		<property name="pageSize" value="${size.elements.available.process.migration}"/>
+	</bean>
+
+	<bean id="configurableMediaMigrationStrategy" class="com.aimprosoft.importexportcloud.strategies.migration.impl.ConfigurableMediaMigrationStrategy">
+		<property name="mediaService" ref="mediaService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+</beans>

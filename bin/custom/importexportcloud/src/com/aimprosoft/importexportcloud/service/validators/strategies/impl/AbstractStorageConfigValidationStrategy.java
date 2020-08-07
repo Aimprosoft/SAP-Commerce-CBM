@@ -9,7 +9,7 @@ import org.apache.commons.lang.StringUtils;
 public abstract class AbstractStorageConfigValidationStrategy implements StorageConfigValidationStrategy
 {
 	@Override
-	public void validate(StorageConfigData storageConfigData) throws CloudStorageException
+	public void validate(final StorageConfigData storageConfigData) throws CloudStorageException
 	{
 		if (null == storageConfigData)
 		{

@@ -27,55 +27,55 @@
 		<property name="mediaScriptModifier" ref="mediaExportScriptModifier"/>
 	</bean>
 
-	<bean id="abstractComposedTypesProducer"
+	<bean id="abstractComposedTypesGenerator"
 	      class="com.aimprosoft.importexportcloud.export.generators.impl.AbstractComposedTypesGenerator" abstract="true">
 		<property name="exportConfigurationService" ref="exportConfigurationService"/>
 	</bean>
 
-	<alias name="defaultContentComposedTypesProducer" alias="contentComposedTypesProducer"/>
-	<bean id="defaultContentComposedTypesProducer"
+	<alias name="defaultContentComposedTypesGenerator" alias="contentComposedTypesGenerator"/>
+	<bean id="defaultContentComposedTypesGenerator"
 	      class="com.aimprosoft.importexportcloud.export.generators.impl.ContentComposedTypesGenerator"
-	      parent="abstractComposedTypesProducer">
+	      parent="abstractComposedTypesGenerator">
 		<property name="exportConfigurationService" ref="exportConfigurationService"/>
 	</bean>
 
-	<alias name="defaultProductComposedTypesProducer" alias="productComposedTypesProducer"/>
-	<bean id="defaultProductComposedTypesProducer"
+	<alias name="defaultProductComposedTypesGenerator" alias="productComposedTypesGenerator"/>
+	<bean id="defaultProductComposedTypesGenerator"
 	      class="com.aimprosoft.importexportcloud.export.generators.impl.ProductComposedTypesGenerator"
-	      parent="abstractComposedTypesProducer">
+	      parent="abstractComposedTypesGenerator">
 		<property name="exportConfigurationService" ref="exportConfigurationService"/>
 	</bean>
 
-	<alias name="defaultClassificationComposedTypesProducer" alias="classificationComposedTypesProducer"/>
-	<bean id="defaultClassificationComposedTypesProducer"
+	<alias name="defaultClassificationComposedTypesGenerator" alias="classificationComposedTypesGenerator"/>
+	<bean id="defaultClassificationComposedTypesGenerator"
 	      class="com.aimprosoft.importexportcloud.export.generators.impl.ClassificationComposedTypesGenerator"
-	      parent="abstractComposedTypesProducer">
+	      parent="abstractComposedTypesGenerator">
 		<property name="exportConfigurationService" ref="exportConfigurationService"/>
 	</bean>
 
 	<util:list id="siteProducers">
-		<ref bean="defaultContentComposedTypesProducer"/>
-		<ref bean="defaultProductComposedTypesProducer"/>
-		<ref bean="defaultClassificationComposedTypesProducer"/>
+		<ref bean="defaultContentComposedTypesGenerator"/>
+		<ref bean="defaultProductComposedTypesGenerator"/>
+		<ref bean="defaultClassificationComposedTypesGenerator"/>
 	</util:list>
 
-	<alias name="defaultSiteComposedTypesProducer" alias="siteComposedTypesProducer"/>
-	<bean id="defaultSiteComposedTypesProducer"
+	<alias name="defaultSiteComposedTypesGenerator" alias="siteComposedTypesGenerator"/>
+	<bean id="defaultSiteComposedTypesGenerator"
 	      class="com.aimprosoft.importexportcloud.export.generators.impl.SiteComposedTypesGenerator"
-	      parent="abstractComposedTypesProducer">
+	      parent="abstractComposedTypesGenerator">
 		<property name="generators" ref="siteProducers"/>
 		<property name="exportConfigurationService" ref="exportConfigurationService"/>
 	</bean>
 
 	<util:map id="composedTypesGeneratorsMap">
-		<entry key="#{T(de.hybris.platform.cms2.model.site.CMSSiteModel)}" value-ref="siteComposedTypesProducer"/>
-		<entry key="#{T(de.hybris.platform.cms2.model.contents.ContentCatalogModel)}" value-ref="contentComposedTypesProducer"/>
-		<entry key="#{T(de.hybris.platform.catalog.model.CatalogModel)}" value-ref="productComposedTypesProducer"/>
+		<entry key="#{T(de.hybris.platform.cms2.model.site.CMSSiteModel)}" value-ref="siteComposedTypesGenerator"/>
+		<entry key="#{T(de.hybris.platform.cms2.model.contents.ContentCatalogModel)}" value-ref="contentComposedTypesGenerator"/>
+		<entry key="#{T(de.hybris.platform.catalog.model.CatalogModel)}" value-ref="productComposedTypesGenerator"/>
 		<entry key="#{T(de.hybris.platform.catalog.model.classification.ClassificationSystemModel)}"
-		       value-ref="classificationComposedTypesProducer"/>
+		       value-ref="classificationComposedTypesGenerator"/>
 	</util:map>
 
-	<bean id="onlineCatalogEntriesFilter" class="com.aimprosoft.importexportcloud.export.filters.impl.OnlineCatalogEntriesFilter">
+	<bean id="onlineCatalogEntriesExportFilter" class="com.aimprosoft.importexportcloud.export.filters.impl.OnlineCatalogEntriesExportFilter">
 		<property name="filesToSkip">
 			<set>
 				<value>SolrFacetSearchConfig2CatalogVersionRelation.csv</value>
@@ -91,8 +91,8 @@
 		<property name="onlineCatalogVersionName" value="#{':'}${online.catalog.version.name}"/>
 	</bean>
 
-	<bean id="classificationCatalogRelationFilter"
-	      class="com.aimprosoft.importexportcloud.export.filters.impl.ClassificationCatalogRelationFilter">
+	<bean id="classificationCatalogRelationExportFilter"
+	      class="com.aimprosoft.importexportcloud.export.filters.impl.ClassificationCatalogRelationExportFilter">
 		<property name="filesToFilter">
 			<set>
 				<value>CategoryCategoryRelation.csv</value>
@@ -100,22 +100,113 @@
 		</property>
 	</bean>
 
-	<bean id="catalogsFileFilter" class="com.aimprosoft.importexportcloud.export.filters.impl.CatalogsFileFilter">
+	<bean id="catalogsFileExportFilter" class="com.aimprosoft.importexportcloud.export.filters.impl.CatalogsFileExportFilter">
 		<property name="iemCmsSiteService" ref="iemCmsSiteService"/>
 	</bean>
 
-	<bean id="catalogRelatedEntriesFilter"
-	      class="com.aimprosoft.importexportcloud.export.filters.impl.CatalogRelatedEntriesFilter">
+	<bean id="catalogRelatedEntriesExportFilter"
+	      class="com.aimprosoft.importexportcloud.export.filters.impl.CatalogRelatedEntriesExportFilter">
 		<property name="exportFileFilters">
 			<list>
-				<ref bean="catalogsFileFilter"/>
-				<ref bean="classificationCatalogRelationFilter"/>
+				<ref bean="catalogsFileExportFilter"/>
+				<ref bean="classificationCatalogRelationExportFilter"/>
 			</list>
 		</property>
 		<property name="filesToFilter">
 			<set>
 				<value>CategoryCategoryRelation.csv</value>
 				<value>Media.csv</value>
+                <value>ElementsForSlot.csv</value>
+                <value>RestrictionsForPages.csv</value>
+                <value>ProductVendorRelation.csv</value>
+                <value>ProductFeature.csv</value>
+				<value>UsersForRestriction.csv</value>
+				<value>CampaignsForRestriction.csv</value>
+				<value>CategoriesForRestriction.csv</value>
+				<value>CategoryProductRelation.csv</value>
+				<value>ElementsForContainer.csv</value>
+				<value>ProductsForProductCarouselComponent.csv</value>
+				<value>RestrictionsForComponents.csv</value>
+				<value>SolrFacetSearchConfig2CatalogVersionRelation.csv</value>
+				<value>CmsActionsForCmsComponents.csv</value>
+			</set>
+		</property>
+	</bean>
+
+    <bean id="cmsSiteExportFilter" class="com.aimprosoft.importexportcloud.export.filters.impl.CmsSiteExportFilter">
+        <property name="filesToFilter">
+            <set>
+                <value>CMSSite.csv</value>
+            </set>
+        </property>
+    </bean>
+
+    <bean id="warehouseRelatedEntriesExportFilter"
+          class="com.aimprosoft.importexportcloud.export.filters.impl.WarehouseRelatedEntriesExportFilter">
+		<property name="filesToFilterByVendor">
+			<set>
+				<value>Vendor.csv</value>
+				<value>Warehouse.csv</value>
+			</set>
+		</property>
+        <property name="filesToFilterByWarehouse">
+            <set>
+                <value>StockLevel.csv</value>
+            </set>
+        </property>
+    </bean>
+
+
+    <bean id="solrRelatedEntriesExportFilter" class="com.aimprosoft.importexportcloud.export.filters.impl.SolrRelatedEntriesExportFilter">
+        <property name="filterBySolrIndexedTypesFiles">
+            <set>
+                <value>SolrIndexedType.csv</value>
+                <value>SolrSearchQueryTemplate.csv</value>
+                <value>SolrSort.csv</value>
+                <value>SolrSearchQueryProperty.csv</value>
+                <value>SolrIndexedProperty2SolrValueRangeSetRelation.csv</value>
+                <value>SolrSortField.csv</value>
+                <value>SolrIndexedProperty.csv</value>
+            </set>
+        </property>
+        <property name="filterBySolrFacetSearchConfigurationNameFiles">
+            <set>
+                <value>SolrFacetSearchConfig.csv</value>
+                <value>SolrFacetSearchConfig2CurrencyRelation.csv</value>
+                <value>SolrFacetSearchConfig2LanguageRelation.csv</value>
+            </set>
+        </property>
+        <property name="filterBySolrValueRangeFiles">
+            <set>
+                <value>SolrValueRange.csv</value>
+                <value>SolrValueRangeSet.csv</value>
+            </set>
+        </property>
+    </bean>
+
+
+	<bean id="solrIndexerQueryExportFilter"
+		  class="com.aimprosoft.importexportcloud.export.filters.impl.SolrIndexerQueryExportFilter">
+		<property name="filesToFilter">
+			<set>
+				<value>SolrIndexerQuery.csv</value>
+			</set>
+		</property>
+	</bean>
+
+	<bean id="rendererTemplateExportFilter" class="com.aimprosoft.importexportcloud.export.filters.impl.RendererTemplateExportFilter">
+		<property name="cmsPageTemplateDao" ref="cmsPageTemplateDao"/>
+		<property name="filesToFilter">
+			<set>
+				<value>RendererTemplate.csv</value>
+			</set>
+		</property>
+	</bean>
+
+	<bean id="catalogUnawareMediaExportFilter" class="com.aimprosoft.importexportcloud.export.filters.impl.CatalogUnawareMediaExportFilter">
+		<property name="filesToFilter">
+			<set>
+				<value>CatalogUnawareMedia.csv</value>
 			</set>
 		</property>
 	</bean>
@@ -134,16 +225,38 @@
 	      class="com.aimprosoft.importexportcloud.export.impl.DefaultExportResultProcessor">
 		<property name="modelService" ref="modelService"/>
 		<property name="taskInfoService" ref="taskInfoService"/>
+		<property name="mediaSeparator" ref="mediaSeparator"/>
 		<property name="exportFileFilters">
 			<list>
-				<ref bean="onlineCatalogEntriesFilter"/>
-				<ref bean="catalogRelatedEntriesFilter"/>
+				<ref bean="onlineCatalogEntriesExportFilter"/>
+				<ref bean="catalogRelatedEntriesExportFilter"/>
+                <ref bean="cmsSiteExportFilter"/>
+                <ref bean="warehouseRelatedEntriesExportFilter"/>
+                <ref bean="solrRelatedEntriesExportFilter"/>
+                <ref bean="solrIndexerQueryExportFilter"/>
+                <ref bean="rendererTemplateExportFilter"/>
+                <ref bean="catalogUnawareMediaExportFilter"/>
 			</list>
 		</property>
 		<property name="exportFileMergeStrategy" ref="exportFileMergeStrategy"/>
 	</bean>
 
-	<alias name="defaultExportFileMergeStrategy" alias="exportFileMergeStrategy"/>
+    <alias name="defaultMediaSeparator" alias="mediaSeparator"/>
+    <bean id="defaultMediaSeparator"
+          class="com.aimprosoft.importexportcloud.export.impl.DefaultMediaSeparator">
+        <property name="mediaBatchArchiveProducer" ref="mediaBatchArchiveProducer"/>
+        <property name="archiveService" ref="archiveService"/>
+    </bean>
+
+	<alias name="defaultMediaBatchArchiveProducer" alias="mediaBatchArchiveProducer"/>
+	<bean id="defaultMediaBatchArchiveProducer" class="com.aimprosoft.importexportcloud.export.impl.DefaultMediaBatchArchiveProducer">
+		<property name="archiveService" ref="archiveService"/>
+	</bean>
+
+	<alias name="defaultArchiveService" alias="archiveService"/>
+	<bean id="defaultArchiveService" class="com.aimprosoft.importexportcloud.service.impl.DefaultArchiveService"/>
+
+    <alias name="defaultExportFileMergeStrategy" alias="exportFileMergeStrategy"/>
 	<bean id="defaultExportFileMergeStrategy" class="com.aimprosoft.importexportcloud.export.impl.DefaultExportFileMergeStrategy"/>
 
 	<bean id="commonScriptModifier" class="com.aimprosoft.importexportcloud.service.script.modifiers.CommonScriptModifier"/>

@@ -25,6 +25,7 @@ public class StorageConfigPopulator implements Populator<StorageConfigModel, Sto
 			target.setName(source.getName());
 			target.setStorageTypeData(storageTypeConverter.convert(source.getType()));
 			target.setIsConnected(source.getIsConnected());
+			target.setUseSignedUrls(source.isUseSignedURLs());
 		}
 	}
 

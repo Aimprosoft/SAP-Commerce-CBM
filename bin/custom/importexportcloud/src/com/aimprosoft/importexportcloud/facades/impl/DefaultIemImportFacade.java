@@ -5,24 +5,36 @@ import de.hybris.platform.servicelayer.impex.ImportResult;
 import de.hybris.platform.servicelayer.impex.ImportService;
 import de.hybris.platform.servicelayer.impex.impl.FileBasedImpExResource;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Enumeration;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
+import de.hybris.platform.util.Config;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
 
 import com.aimprosoft.importexportcloud.enums.TaskInfoStatus;
 import com.aimprosoft.importexportcloud.exceptions.ImportException;
-import com.aimprosoft.importexportcloud.facades.ImportFacade;
+import com.aimprosoft.importexportcloud.facades.IemImportFacade;
 import com.aimprosoft.importexportcloud.facades.data.TaskInfoData;
 import com.aimprosoft.importexportcloud.model.TaskInfoModel;
 import com.aimprosoft.importexportcloud.service.TaskInfoService;
 
 
-public class DefaultImportFacade implements ImportFacade
+public class DefaultIemImportFacade implements IemImportFacade
 {
-	private static final Logger LOGGER = Logger.getLogger(DefaultImportFacade.class);
-	private static final String COULDN_T_IMPORT_IMPEX = "Couldn't import impex";
+	private static final Logger LOGGER = Logger.getLogger(DefaultIemImportFacade.class);
 	private static final String IMPEX_ENCODING = "UTF-8";
+	private static final String FILE_SEPARATOR = File.separator;
 
 	private ImportService importService;
 
@@ -38,6 +50,14 @@ public class DefaultImportFacade implements ImportFacade
 		logStartingImport(taskInfoData);
 
 		final ImportConfig importConfig = getImportConfig(taskInfoData, taskInfo);
+
+		boolean isImportByBatchNeeded = Config.getBoolean("need.import.by.batch", false);
+
+		if (isImportByBatchNeeded)
+		{
+			importMediaByBatch(taskInfo, taskInfoData);
+		}
+
 		final ImportResult importResult = importService.importData(importConfig);
 
 		taskInfoService.setTaskInfoCronJob(taskInfo, importResult.getCronJob());
@@ -49,12 +69,58 @@ public class DefaultImportFacade implements ImportFacade
 		else
 		{
 			taskInfoService.setTaskInfoStatus(taskInfo, TaskInfoStatus.FAILED);
-			throw new ImportException(COULDN_T_IMPORT_IMPEX, taskInfo);
+			throw new ImportException(StringUtils.EMPTY, taskInfo);
 		}
 
 		taskInfoService.setTaskInfoFinishedDate(taskInfo);
 
 		return taskInfoData;
+	}
+
+	private void importMediaByBatch(final TaskInfoModel taskInfo, final TaskInfoData taskInfoData) throws ImportException
+	{
+		final Path zipFolderPath = taskInfoData.getDownloadedFilePath();
+		final Path parentDirPath = zipFolderPath.getParent();
+		try (final ZipFile archive = new ZipFile(zipFolderPath.toString()))
+		{
+			final Enumeration<? extends ZipEntry> zipEntries = archive.entries();
+
+			while (zipEntries.hasMoreElements())
+			{
+				final ZipEntry zipEntry = zipEntries.nextElement();
+				if (zipEntry.getName().contains(".zip"))
+				{
+					final Path fileToCreate = parentDirPath.resolve(zipEntry.getName());
+					try (final InputStream inputStream = archive.getInputStream(zipEntry))
+					{
+						Files.copy(inputStream, fileToCreate, StandardCopyOption.REPLACE_EXISTING);
+					}
+					final Path tempMediaFilePath = Paths.get(parentDirPath + FILE_SEPARATOR + zipEntry.getName());
+					taskInfoData.setDownloadedFilePath(tempMediaFilePath);
+					final ImportConfig importConfig = getImportConfig(taskInfoData, taskInfo);
+
+					importService.importData(importConfig);
+					removeTempFiles(tempMediaFilePath);
+				}
+			}
+			taskInfoData.setDownloadedFilePath(zipFolderPath);
+		}
+		catch (IOException ex)
+		{
+			throw new ImportException("An error occurred while importing data ", taskInfo);
+		}
+	}
+
+	private void removeTempFiles(Path tempFilePath)
+	{
+		try
+		{
+			Files.delete(tempFilePath);
+		}
+		catch (IOException e)
+		{
+			LOGGER.warn("Temp file is not removed.");
+		}
 	}
 
 	private ImportConfig getImportConfig(final TaskInfoData taskInfoData, final TaskInfoModel taskInfoModel) throws ImportException
@@ -70,7 +136,8 @@ public class DefaultImportFacade implements ImportFacade
 			config.setEnableCodeExecution(true);
 			config.setDistributedImpexEnabled(false);
 
-			final FileBasedImpExResource scriptImpExResource = new FileBasedImpExResource(downloadedFilePath.toFile(), IMPEX_ENCODING);
+			final FileBasedImpExResource scriptImpExResource = new FileBasedImpExResource(downloadedFilePath.toFile(),
+					IMPEX_ENCODING);
 			config.setScript(scriptImpExResource);
 
 			if (taskInfoData.isExportMediaNeeded())

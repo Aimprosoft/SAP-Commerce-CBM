@@ -16,15 +16,15 @@ public class DefaultStorageConfigValidator implements StorageConfigValidator
 	Map<String, StorageConfigValidationStrategy> storageConfigValidationStrategyMap;
 
 	@Override
-	public void validate(StorageConfigData storageConfigData) throws CloudStorageException
+	public void validate(final StorageConfigData storageConfigData) throws CloudStorageException
 	{
-		StorageTypeData storageTypeData = storageConfigData.getStorageTypeData();
+		final StorageTypeData storageTypeData = storageConfigData.getStorageTypeData();
 
 		validateStorageTypeData(storageTypeData);
 
-		String storageTypeCode = storageTypeData.getCode();
+		final String storageTypeCode = storageTypeData.getCode();
 
-		StorageConfigValidationStrategy storageConfigValidator = storageConfigValidationStrategyMap.get(storageTypeCode);
+		final StorageConfigValidationStrategy storageConfigValidator = storageConfigValidationStrategyMap.get(storageTypeCode);
 
 		if (storageConfigValidator != null)
 		{
@@ -36,7 +36,7 @@ public class DefaultStorageConfigValidator implements StorageConfigValidator
 		}
 	}
 
-	private void validateStorageTypeData(StorageTypeData storageTypeData) throws CloudStorageException
+	private void validateStorageTypeData(final StorageTypeData storageTypeData) throws CloudStorageException
 	{
 		if (storageTypeData == null)
 		{
@@ -56,7 +56,7 @@ public class DefaultStorageConfigValidator implements StorageConfigValidator
 
 	@Required
 	public void setStorageConfigValidationStrategyMap(
-			Map<String, StorageConfigValidationStrategy> storageConfigValidationStrategyMap)
+			final Map<String, StorageConfigValidationStrategy> storageConfigValidationStrategyMap)
 	{
 		this.storageConfigValidationStrategyMap = storageConfigValidationStrategyMap;
 	}

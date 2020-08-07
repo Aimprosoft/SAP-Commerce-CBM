@@ -4,7 +4,7 @@ import com.aimprosoft.importexportcloud.exceptions.ImportException;
 import com.aimprosoft.importexportcloud.facades.data.TaskInfoData;
 
 
-public interface ImportFacade
+public interface IemImportFacade
 {
 	/**
 	 * Performs importing of a specified zip file.

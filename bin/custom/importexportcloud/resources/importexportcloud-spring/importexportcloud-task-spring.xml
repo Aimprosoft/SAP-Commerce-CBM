@@ -7,6 +7,17 @@
 	<bean id="defaultTaskInfoPaginatedDao" class="com.aimprosoft.importexportcloud.dao.impl.DefaultTaskInfoPaginatedDao">
 		<constructor-arg value="TaskInfo"/>
 		<property name="paginatedFlexibleSearchService" ref="paginatedFlexibleSearchService"/>
+		<property name="taskStatuses">
+			<list value-type="com.aimprosoft.importexportcloud.enums.TaskInfoStatus">
+				<value>PARTLYMIGRATED</value>
+				<value>DOWNLOADED</value>
+				<value>COMPLETED</value>
+				<value>EXPORTED</value>
+				<value>IMPORTED</value>
+				<value>ABORTED</value>
+				<value>FAILED</value>
+			</list>
+		</property>
 	</bean>
 
 	<alias name="defaultTaskInfoService" alias="taskInfoService"/>
@@ -16,6 +27,7 @@
 		<property name="keyGenerator" ref="taskInfoCodeGenerator"/>
 		<property name="exportTaskInfoReverseConverter" ref="exportTaskInfoReverseConverter"/>
 		<property name="importTaskInfoReverseConverter" ref="importTaskInfoReverseConverter"/>
+		<property name="userService" ref="userService"/>
 	</bean>
 
 	<!-- task-->

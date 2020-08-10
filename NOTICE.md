@@ -1,4 +1,4 @@
-## SAP Commerce Cloud CBM v.1.0
+## SAP Commerce Cloud CBM v.2.0
 
 Copyright 2020 Aimprosoft
 

@@ -1,5 +1,4 @@
-
-## Install guide for using Cloud Commerce CBM v.1.0
+## Install guide for using Cloud Commerce CBM v.2.0
 
 Your project must use Hybris Commerce 18.08
 
